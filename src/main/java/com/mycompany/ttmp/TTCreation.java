@@ -1,5 +1,6 @@
 package com.mycompany.ttmp;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -199,7 +200,8 @@ public class TTCreation extends javax.swing.JFrame {
         timeTable=new String[days.length][periods.length];
         //subjects=TimeTableControl.getSubjects(selectedClass.getId());
 //        System.out.println(subjects.length);
-        var v = TimeTableControl.getFacultySubjectDetails(selectedClass.getId());
+        var v = TimeTableControl.getFacultySubjectDetails(selectedClass.getId(),
+                LocalDate.now().atStartOfDay().plusDays(1).toLocalDate(), null);
         for (int i = 0; i < v.size(); i++)
         {
             var f = new FacSub(i, v.get(i));
