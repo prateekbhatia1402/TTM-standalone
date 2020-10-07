@@ -287,11 +287,17 @@ final class TimeTables
                  {
                      addLatestTimeTable(id, rs.getDate(1).toLocalDate(), null);
                  }
+                 else
+                 {
+                     latest = "false";
+                 }
                 } catch (SQLException ex) {
                     Logger.getLogger(TimeTables.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
+        if (latest.equals("false"))
+            return new ArrayList<>();
         TimeTable timeTable = tables.get(latest);
         if (!timeTable.hasSchedule())
         {
@@ -499,7 +505,8 @@ public class TimeTableControl {/*
         return false;
     }
     
-     static ArrayList<FacSub> getFacultySubjectDetails(String classId){
+     static ArrayList<FacSub> getFacultySubjectDetails(String classId,
+             LocalDate from, LocalDate to){
         ArrayList<FacSub> details=new ArrayList<>();
         try(Connection con=SqlConnect.getDatabaseConnection()) {
             Statement st=con.createStatement();
@@ -520,7 +527,7 @@ public class TimeTableControl {/*
                 String subId=rs.getString(3);
                 String subject=rs.getString(4);
                 int req = rs.getInt(5);
-                ArrayList<Schedule> schedule = getFacultyTimeTable(id);
+                ArrayList<Schedule> schedule = getFacultyTimeTable(id, from, to);
                 HashSet<String> facSchedule = new HashSet<>();
                 for (Schedule s: schedule)
                 {
@@ -548,6 +555,40 @@ public class TimeTableControl {/*
         return new TimeTables().fetchLatestTimeTable(id);
     }
      
+    public static ArrayList<Schedule> getFacultyTimeTable(String id, LocalDate from,
+            LocalDate to){
+        ArrayList<Schedule> schedule = new ArrayList<>();
+        try(Connection con=SqlConnect.getDatabaseConnection()) {
+            Statement st=con.createStatement();
+            if (to == null)
+                to = LocalDate.now().plusYears(20);
+        String query="select `day id`,`timeslot id`,`class id`,`subject id` "
+                + "from schedule where `faculty id`='"+id+"' and wef <= '"+
+                to.format(DateTimeFormatter.ISO_DATE)+"'"
+                + " UNION select `day id`,`timeslot id`,`class id`,`subject id`"
+                + " from schedule_records where `faculty id`='"+id+"' and `to` >= '"
+                +from.format(DateTimeFormatter.ISO_DATE)+"'";
+            ////System.out.println(query);
+            ResultSet rs=st.executeQuery(query);
+            if (rs.last() == false)
+                return null;
+            int count=rs.getRow();
+            rs.first();
+            for(int i=0;i<count;i++,rs.next()){
+                String dayId=rs.getString(1);
+                String timeslotId=rs.getString(2);
+                String classId=rs.getString(3);
+                String subjectId=rs.getString(4);
+                schedule.add(new Schedule(dayId, timeslotId, classId, subjectId,
+                        id, -1));
+            }
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(TimeTableControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+        return schedule;
+    }
     public static ArrayList<Schedule> getFacultyTimeTable(String id){
         ArrayList<Schedule> schedule = new ArrayList<>();
         try(Connection con=SqlConnect.getDatabaseConnection()) {

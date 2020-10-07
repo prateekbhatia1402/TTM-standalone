@@ -35,7 +35,7 @@ public class Schedule implements Serializable {
         this.facultyId = facultyId;
         this.roomId = roomId;
     }
-
+    
     public Schedule( int id,LocalDate from,LocalDate till,String dayId,
             String timeslotId, String classId, String subjectId, 
             String facultyId, int roomId)
