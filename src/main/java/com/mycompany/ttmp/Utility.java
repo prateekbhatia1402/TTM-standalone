@@ -26,10 +26,11 @@ public class Utility {
         int r = Integer.parseInt(color.substring(1,3), 16);
         int g = Integer.parseInt(color.substring(3,5), 16);
         int b = Integer.parseInt(color.substring(5,7), 16);
-        int avg = (r + g + b) / 3;
-        String otherColor = "#ffffff";
-        if (avg > 0x7f)
-            otherColor = "#000000";
+        String d = ( 0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.5 ? "00" : "ff";
+        //int avg = (r + g + b) / 3;
+        String otherColor = "#"+d+d+d;
+        //if (avg > 0x7f)
+        //    otherColor = "#000000";
         if (ColorType.FG == ctype)
         {
             return colorCodeValue(value, otherColor, color);

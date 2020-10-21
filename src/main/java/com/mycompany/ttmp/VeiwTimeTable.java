@@ -586,6 +586,7 @@ else
                     timeTable[j][i]="";
             //System.out.println("Reset Completed : "+LocalDateTime.now());
             
+        HashMap<String, String> cellColorValues = new HashMap<>();
         if(id.contains("C"))
             timeTableOf=ClassControl.getClass(id).getName();
         else
@@ -607,14 +608,18 @@ else
             String subId = record.getSubjectId();
             if (!cellInfo.containsKey(subId))
             {
-                String color = Utility.colors[colorIndex++];
                 cellInfo.put(subId,
                         TimeTableControl.getSubject(record.getSubjectId())
-                                .getSubjectName()+"_"+color);
+                                .getSubjectName());
             }
-            String subjectInfo = (String)cellInfo.get(subId);
-            String subject = subjectInfo.substring(0, subjectInfo.indexOf("_"));
-            String subjectColor = subjectInfo.substring(subjectInfo.indexOf("_")+1);
+            if (!cellColorValues.containsKey(subId))
+            {
+                String color = Utility.colors[colorIndex++];
+                cellColorValues.put(subId, color);
+            }
+        
+            String subject = (String)cellInfo.get(subId);
+            String subjectColor = cellColorValues.getOrDefault(subId, "#ffffff");
             String val;
             int roomId=record.getRoomId();
             if(id.contains("C"))
