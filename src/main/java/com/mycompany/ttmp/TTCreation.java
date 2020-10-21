@@ -410,9 +410,9 @@ public class TTCreation extends javax.swing.JFrame {
             subjectName = facSub.getSubName();
             timeTable[day][period]=fac_sub;
             increaseSubCount(subjectId);
-        timeTableModel.setValueAt(facName+
-                " "+subjectName
-                , day, period+1);
+        timeTableModel.setValueAt(
+                Utility.colorCodeValue(facName + " " + subjectName,
+                        facSub.getColor()), day, period+1);
         }
     }
     public TTCreation() {
@@ -1183,11 +1183,11 @@ else
             if(!facSub.meetsRequirements())
             {
                 c=0;
-                color = "red";
+                color = "#ff0000";
             }
             else
             {
-                color = "green";
+                color = "#00ff00";
             }
                 //System.out.println(allFacSubDetailsMap.get(i).getSubName()+" NOT OK");
                 subjectTableModel.addRow(

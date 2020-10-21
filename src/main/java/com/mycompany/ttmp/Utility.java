@@ -11,21 +11,33 @@ package com.mycompany.ttmp;
  */
 public class Utility {
 
-    public static String [] colors = {"blue", "fuchsia", "olive", "navy",
-    "teal", "yellow", "aqua", "orange"};
+    public static String [] colors = {"#0000ff", "#ff00ff", "#808000", "#000080",
+    "#008080", "#ffff00", "#00ffff", "#ffa500"};
     public static enum ColorType{BG, FG};
     public static String defaultBgColor = "white";
     public static String defaultFgColor = "black";    
+    private static ColorType defaultType = ColorType.BG;
     public static String colorCodeValue(String value, String color)
     {
-        return colorCodeValue(value, color, defaultFgColor);
+        return colorCodeValue(value, color, defaultType);
     }
     public static String colorCodeValue(String value, String color, ColorType ctype)
     {
+        int r = Integer.parseInt(color.substring(1,3), 16);
+        int g = Integer.parseInt(color.substring(3,5), 16);
+        int b = Integer.parseInt(color.substring(5,7), 16);
+        int avg = (r + g + b) / 3;
+        String otherColor = "#ffffff";
+        if (avg > 0x7f)
+            otherColor = "#000000";
         if (ColorType.FG == ctype)
-            return colorCodeValue(value, defaultBgColor, color);
+        {
+            return colorCodeValue(value, otherColor, color);
+        }
         else 
-            return colorCodeValue(value, color, defaultFgColor);
+        {
+            return colorCodeValue(value, color, otherColor);
+        }
     }
     public static String colorCodeValue(String value, String bgcolor,String fgcolor)
     {
