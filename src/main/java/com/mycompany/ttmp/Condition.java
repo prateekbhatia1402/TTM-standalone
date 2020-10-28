@@ -5,6 +5,11 @@
  */
 package com.mycompany.ttmp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.DefaultListModel;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author devga
@@ -14,8 +19,55 @@ public class Condition extends javax.swing.JFrame {
     /**
      * Creates new form Condition
      */
-    public Condition() {
+    enum Mode
+    {
+        EDIT, VIEW
+    }
+    String[] columnNames;
+    Class[] columnTypes;
+    ArrayList<FacSub> allFacSubs;
+    HashMap<String, FacSub> allFacSubsMap;
+    FastSelection initFastSelection;
+    FastSelection fastSelection;
+    TTCreation parentForm;
+    TimeSlot[] periods;
+    Day[] days;
+    String selectedId;
+    Mode currentMode;
+    ArrayList<String> selections = new ArrayList<>();
+    Condition(ArrayList<FacSub> allFacSub, FastSelection fastSelection, TTCreation parentForm){
         initComponents();
+        currentMode = Mode.EDIT;
+        allFacSubs =  allFacSub;
+        allFacSubsMap = new HashMap<>();
+        allFacSubs.forEach(v -> {
+            allFacSubsMap.put(v.getSubId(), v);
+        });
+        this.initFastSelection = fastSelection;
+        this.fastSelection = new FastSelection(fastSelection);
+        periods = TimeSlotControl.getAllSlots();
+        days = DayControl.getAllDays();
+        this.parentForm = parentForm;
+        columnNames = new String[periods.length + 1];
+        columnTypes = new Class[periods.length + 1];
+        columnNames[0] = "Day\\Period";
+        columnTypes[0] = java.lang.String.class;
+        for (int i = 0; i < periods.length; i++)
+        {
+            columnNames[i + 1] = periods[i].toSimpleString();
+            columnTypes[i + 1] = java.lang.Boolean.class;
+        }
+        initTable();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        listModel.clear();
+        allFacSub.forEach(v -> {
+            listModel.addElement(
+                    Utility.colorCodeValue(
+                    v.getFacName() + " ("+v.getFacId()+") " + v.getSubName(),
+                            v.getColor()));
+        });
+        listModel.addElement("FREE");
+        jList1.setModel(listModel);
     }
 
     /**
@@ -33,13 +85,15 @@ public class Condition extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel3 = new javax.swing.JPanel();
+        jTextField1 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
-        jTextField1 = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
@@ -57,6 +111,11 @@ public class Condition extends javax.swing.JFrame {
         jLabel1.setOpaque(true);
 
         jButton1.setText("<-");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -83,28 +142,37 @@ public class Condition extends javax.swing.JFrame {
         jPanel3.setBackground(new java.awt.Color(0, 153, 153));
         jPanel3.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 102, 102), 5, true));
 
+        jTextField1.setText("jTextField1");
+
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
+        jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList1ValueChanged(evt);
+            }
+        });
         jScrollPane1.setViewportView(jList1);
-
-        jTextField1.setText("jTextField1");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-            .addComponent(jScrollPane1)
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
+                .addContainerGap(262, Short.MAX_VALUE))
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                    .addGap(0, 36, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         jSplitPane1.setLeftComponent(jPanel3);
@@ -116,8 +184,34 @@ public class Condition extends javax.swing.JFrame {
         jPanel5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 102, 102), 5, true));
 
         jButton2.setText("Add");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Cancel");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("Select");
+        jButton3.setEnabled(false);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton5.setText("Remove");
+        jButton5.setEnabled(false);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -126,16 +220,23 @@ public class Condition extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(228, 228, 228)
+                .addGap(42, 42, 42)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+                        .addComponent(jButton5)
+                        .addComponent(jButton3))
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -166,6 +267,11 @@ public class Condition extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jTable1MouseReleased(evt);
             }
         });
         jScrollPane2.setViewportView(jTable1);
@@ -232,45 +338,162 @@ public class Condition extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+    private void initTable()
+    {
+        initTable("no");
+    }
+    
+    private void leavePage()
+    {
+        parentForm.setVisible(true);
+       parentForm.toFront();
+       this.dispose();
+    }
+    
+    
+    private void initTable(String id)
+    {
+        Object[][] values = null;
+        Boolean[][] editables = new Boolean[days.length][periods.length + 1];
+        if (id != null && !id.equals("no") && !id.isBlank())
+        {
+            values = new Object[days.length][periods.length + 1];
+            FacSub facSub = null;
+            if (!id.equals("no") && !id.equalsIgnoreCase("free"))
+            {
+                facSub = allFacSubsMap.get(id);
+                //System.out.println(facSub.getSubName()+" "+facSub.getLecturesCount());
+            }
+            for (int i = 0; i < days.length; i++)
+            {
+                Object[] val = new Object[periods.length + 1];
+                Boolean editvals[] = new Boolean[periods.length + 1];
+                    for (int j = 0; j < periods.length; j++)
+                    {
+                        //System.out.println("for "+i+", "+j);
+                        var v = fastSelection.cellValues[i][j];
+                        boolean isAssigned = v.id.equals(id) &&
+                                v.value == FastSelection.SelectionValue.Select;
+                        val[j + 1] = isAssigned;
+                        boolean isEditable = v.value != FastSelection.SelectionValue.Select
+                                || v.id.equalsIgnoreCase(selectedId);
+                        //System.out.print(isEditable+" ");
+                        if (!id.equalsIgnoreCase("free")){
+                            
+                            boolean isFree = facSub.isFree(days[i].getDayId(),
+                                periods[j].getId());
+                            //System.out.print(" free : "+isFree);
+                           isEditable = isEditable && isFree;
+                        }
+                        //System.out.println("e & f : "+isEditable);
+                        editvals[j + 1] = isEditable;
+                    }
+                editvals[0] = false;
+                val[0] = days[i].getDayName();
+                for (int j = 0; j <= periods.length; j++)
+                {
+                    
+                    editables[i][j] = editvals[j];
+                    values[i][j] = val[j];
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Condition.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Condition.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Condition.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Condition.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            //System.out.println(Arrays.deepToString(editables));
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Condition().setVisible(true);
+        DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(
+            values,
+                columnNames
+        ) {
+            Class[] types = columnTypes;
+            Boolean[][] canEdit = editables;
+            @Override
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
             }
-        });
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                //System.out.println(rowIndex+" "+columnIndex);
+                return canEdit [rowIndex][columnIndex];
+            }
+        };
+        jTable1.setModel(tableModel);
     }
+    private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
+        int index = jList1.getSelectedIndex();
+        if (index < 0)
+            return;
+        currentMode = Mode.EDIT;
+        String id;
+        if (index == allFacSubs.size())
+            id = "free";
+        else
+        {
+            var facSub = allFacSubs.get(index);
+            id = facSub.getSubId();
+        }
+        selectedId = id;
+        initTable(id);
+    }//GEN-LAST:event_jList1ValueChanged
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       leavePage();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        leavePage();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        initFastSelection.replace(fastSelection);
+        parentForm.applyFastSelection();
+        leavePage();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if (currentMode == Mode.EDIT)
+        {
+        DefaultTableModel tableModel = (DefaultTableModel)jTable1.getModel();
+        for (int i = 0; i < days.length; i++)
+        {
+            for (int j = 0; j < periods.length; j++)
+            {
+                boolean select = (boolean) tableModel.getValueAt(i, j + 1);
+                FastSelection.SelectionValue val = select ? FastSelection.SelectionValue.Select
+                        : FastSelection.SelectionValue.UnSelect;
+                fastSelection.add(selectedId, i, j, val);
+            }
+        }
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    
+    private void jTable1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseReleased
+        if (currentMode == Mode.EDIT)
+        {
+            int day = jTable1.getSelectedRow();
+            int period = jTable1.getSelectedColumn();
+            if (period > 0)
+            {
+                FastSelection.SelectionValue selection ;
+            if((boolean)jTable1.getValueAt(day, period))
+                selection = FastSelection.SelectionValue.Select;
+            else selection = FastSelection.SelectionValue.None;
+            fastSelection.add(selectedId, day, period - 1, selection);
+            }
+        }
+    }//GEN-LAST:event_jTable1MouseReleased
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton5ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
