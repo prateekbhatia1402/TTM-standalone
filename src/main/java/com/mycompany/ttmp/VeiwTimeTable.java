@@ -586,12 +586,14 @@ else
                     timeTable[j][i]="";
             //System.out.println("Reset Completed : "+LocalDateTime.now());
             
+        HashMap<String, String> cellColorValues = new HashMap<>();
         if(id.contains("C"))
             timeTableOf=ClassControl.getClass(id).getName();
         else
             timeTableOf=(String)FacultyControl.getSpecificData(
                            id,new String[]{"name"}) [0];
         jTableOfLabel.setText(timeTableOf);
+        int colorIndex = 0;
         //System.out.println("Iterating over Records : "+LocalDateTime.now());
         for(Schedule record: schedule)
         {
@@ -605,10 +607,19 @@ else
             ////System.out.println("Extracting Data : "+LocalDateTime.now());
             String subId = record.getSubjectId();
             if (!cellInfo.containsKey(subId))
+            {
                 cellInfo.put(subId,
                         TimeTableControl.getSubject(record.getSubjectId())
                                 .getSubjectName());
+            }
+            if (!cellColorValues.containsKey(subId))
+            {
+                String color = Utility.colors[colorIndex++];
+                cellColorValues.put(subId, color);
+            }
+        
             String subject = (String)cellInfo.get(subId);
+            String subjectColor = cellColorValues.getOrDefault(subId, "#ffffff");
             String val;
             int roomId=record.getRoomId();
             if(id.contains("C"))
@@ -618,7 +629,8 @@ else
                     cellInfo.put(facId,(String)FacultyControl.getSpecificData(
                            facId,new String[]{"name"}) [0] );
             String facultyName = (String)cellInfo.get(facId);
-                val="<html>"+subject+" ("+facultyName+") <br>"+"("+roomId+")</html>";
+                val=Utility.colorCodeValue(subject+" ("+facultyName+") <br>"+
+                        "("+roomId+")", subjectColor);
             }
             else{
                 String classId = record.getClassId();
@@ -626,7 +638,8 @@ else
                     cellInfo.put(classId,
                             ClassControl.getClass(record.getClassId()).getName());
             String className = (String)cellInfo.get(classId);
-                val="<html>"+subject+"<br>"+className+"("+roomId+")</html>";
+                val=Utility.colorCodeValue(subject+"<br>"+className
+                        +"("+roomId+")", subjectColor);
             }
             if(id.equals(myId))
             {
