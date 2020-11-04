@@ -5,13 +5,9 @@
  */
 package com.mycompany.ttmp;
 
-/**
- *
- * @author prateek
- */
 public class Utility {
 
-    public static String [] colors = {"#0000ff", "#ff00ff", "#808000", "#000080",
+    public static String [] colors = {"#ad00ff", "#ff00ff", "#808000", "#000080",
     "#008080", "#ffff00", "#00ffff", "#ffa500"};
     public static enum ColorType{BG, FG};
     public static String defaultBgColor = "white";
