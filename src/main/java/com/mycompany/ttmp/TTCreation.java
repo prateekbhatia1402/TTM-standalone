@@ -10,6 +10,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import com.mycompany.ttmp.Utility;
+import java.util.Arrays;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -186,7 +187,8 @@ import com.mycompany.ttmp.Utility;
 
     @Override
     public String toString() {
-        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq=" + lectReq + ", lectAssigned=" + lectAssigned + '}';
+        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq=" + 
+                lectReq + ", lectAssigned=" + lectAssigned + '}';
     }
 
         public void setFacId(String facId) {
@@ -320,7 +322,7 @@ public class TTCreation extends javax.swing.JFrame {
     DefaultTableModel subjectTableModel;
     private I_Class[] classes;
     private I_Class selectedClass;
-    private final String roleOfUser;
+    private final role roleOfUser;
     private ArrayList<FacSub> availableFacSubDetailsList = new ArrayList<>();
     private int selectedFacSubIndex=0;
     private int[] selectedRowColumn=new int[2];
@@ -328,12 +330,19 @@ public class TTCreation extends javax.swing.JFrame {
     private final HashMap<String, FacSub> allFacSubDetailsMap = new HashMap<>();
     private ArrayList<FacSub> allFacSubDetailsList = new ArrayList<>();
     private DefaultListModel<String> listModel;
-    
+    private TimeTables timeTables;
     /**
      * Creates new form TTCreation
      */
-    
-    private void initTables(){
+    private void initTables()
+    {
+        initTables(null);
+    }
+    private void initTables(String tid){
+        if(timeTables.getTimeTablesList().isEmpty())
+            jLoadButton.setVisible(false);
+        else
+            jLoadButton.setVisible(true);
         periods=TimeSlotControl.getAllSlots();
         days=DayControl.getAllDays();
         timeTableModel=(DefaultTableModel)jTimeTable.getModel();
@@ -380,15 +389,38 @@ public class TTCreation extends javax.swing.JFrame {
                             facSub.getColor()),facSub.getLectReq(),0});
         });
         System.out.println(subjectTableModel.getRowCount());
-        initTableData(TimeTableControl.getLatestClassTimeTable(selectedClass.getId()));
+        if (tid == null)
+            initTableData(timeTables.fetchLatestTimeTable());
+        else
+            initTableData(timeTables.fetchParticularTimeTable(tid));
         jTimeTable.setEnabled(true);
 }
     
+    private void clearTable()
+    {
+        timeTable = new String[days.length][periods.length];
+        timeTableModel.setRowCount(0);
+        for (Day day : days) {
+            System.out.println(day.getDayId() + " " + day.getDayName());
+            timeTableModel.addRow(new Object[]{day.getDayName()});
+        }
+            
+        subjectTableModel.setRowCount(0);
+        allFacSubDetailsList.forEach(facSub -> {
+            facSub.resetLect();
+            subjectTableModel.addRow(
+                    new Object[]{Utility.colorCodeValue(facSub.getSubName(),
+                            facSub.getColor()),facSub.getLectReq(),0});
+        });
+    }
+    
     private void initTableData(ArrayList<Schedule> schedule){
-        if(schedule==null)
+        if(schedule==null || schedule.isEmpty())
             return;
+        clearTable();
         for(Schedule record : schedule){
             int period=-1,day=-1;
+            
             for(int i=0;i<periods.length;i++)
                 if(periods[i].getId().equalsIgnoreCase(record.getTimeslotId())){
                     period=i;
@@ -417,10 +449,19 @@ public class TTCreation extends javax.swing.JFrame {
     }
     public TTCreation() {
         initComponents();
-        roleOfUser=LoginF.USER_ROLE;
+        jLoadButton.setVisible(false);
+        roleOfUser=LoginF.getUserRole();
         jFacultySelectButton.setEnabled(false);
         jSubmitButton.setEnabled(false);
-        jFastSelectButton.setEnabled(false);
+        jFastSelectButton.setEnabled
+        
+        
+        
+        
+        
+        
+        
+        (false);
         classes=TimeTableControl.getClasses();
         jClassBox.removeAllItems();
         jClassBox.addItem("select class");
@@ -430,6 +471,33 @@ public class TTCreation extends javax.swing.JFrame {
         jClassSelectButton.setEnabled(false);
         jClearSelectionButton.setEnabled(false);
         jTimeTable.setEnabled(false);
+    }
+    
+    TTCreation(TimeTables timeTables, String tid) {
+        initComponents();
+        roleOfUser=LoginF.getUserRole();
+        jFacultySelectButton.setEnabled(false);
+        jSubmitButton.setEnabled(false);
+        jFastSelectButton.setEnabled(false);
+        classes=TimeTableControl.getClasses();
+        jClassBox.removeAllItems();
+        this.timeTables = timeTables;
+        selectedClass = ClassControl.getClass(timeTables.classId);
+        jClassBox.addItem("select class");
+        String svalue = "";
+        for (I_Class classe : classes) {
+            String value = classe.getName()+
+                    (classe.getAssignmentStatus()? "[ UPDATE ]":"[ CREATE ]");
+            jClassBox.addItem(value);
+            if (timeTables.classId.equals(classe.getId()))
+                svalue = value;
+        }
+        jClassSelectButton.setVisible(false);
+        jClassBox.setSelectedItem(svalue);
+        jClassBox.setEnabled(false);
+        jClearSelectionButton.setEnabled(false);
+        jTimeTable.setEnabled(false);
+        initTables(tid);
     }
     
     private boolean requirementsMet(ArrayList<FacSub> facSubList)
@@ -629,7 +697,7 @@ public class TTCreation extends javax.swing.JFrame {
                 break;
         }
     }
-    public String[][] backtrackSchedule(int index, String[][] tt,
+    String[][] backtrackSchedule(int index, String[][] tt,
             ArrayList<int[]> periodsList, ArrayList<FacSub> facSubToAssign)
     {
         System.out.println("in bcktrck : "+index);
@@ -801,6 +869,7 @@ public class TTCreation extends javax.swing.JFrame {
         jClearSelectionButton = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jClearAllButton = new javax.swing.JButton();
+        jLoadButton = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jClassSelectButton = new javax.swing.JButton();
@@ -968,6 +1037,13 @@ public class TTCreation extends javax.swing.JFrame {
             }
         });
 
+        jLoadButton.setText("Load Data");
+        jLoadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jLoadButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -983,7 +1059,9 @@ public class TTCreation extends javax.swing.JFrame {
                 .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(42, 42, 42)
                 .addComponent(jButton1)
-                .addContainerGap(125, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jLoadButton)
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -994,7 +1072,8 @@ public class TTCreation extends javax.swing.JFrame {
                     .addComponent(jFacultySelectButton)
                     .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1)
-                    .addComponent(jClearAllButton))
+                    .addComponent(jClearAllButton)
+                    .addComponent(jLoadButton))
                 .addGap(25, 25, 25))
         );
 
@@ -1210,11 +1289,11 @@ else
 
     private void leavePage(){
         Adminhomescreen.getAdminhomescreen();
-        if(roleOfUser.equals("admin"))
+        if(roleOfUser == role.ADMIN)
     Adminhomescreen.getAdminhomescreen();
-    else if(roleOfUser.equals("faculty"))
+    else if(roleOfUser == role.FACULTY)
     Facultyhomescreen.getFacultyhomescreen();
-    else if(roleOfUser.equals("student"))
+    else if(roleOfUser == role.STUDENT)
     Studenthomescreen.getStudenthomescreen();
     else
     System.exit(0);
@@ -1241,6 +1320,7 @@ else
     jClassBox.setEnabled(false);
     selectedClass=classes[jClassBox.getSelectedIndex()-1];
     jFastSelectButton.setEnabled(true);
+    timeTables = new TimeTables(selectedClass.getId());
     initTables();
     }//GEN-LAST:event_jClassSelectButtonActionPerformed
 
@@ -1313,7 +1393,7 @@ else
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jClearAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jClearAllButtonActionPerformed
-    initTables();        // TODO add your handling code here:
+    clearTable();
     }//GEN-LAST:event_jClearAllButtonActionPerformed
 FastSelection fastSelection;
     private void jFastSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFastSelectButtonActionPerformed
@@ -1336,6 +1416,28 @@ FastSelection fastSelection;
             }
         new Condition(allFacSubDetailsList, fastSelection, this).setVisible(true);
     }//GEN-LAST:event_jFastSelectButtonActionPerformed
+
+    private void jLoadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoadButtonActionPerformed
+    ArrayList<String> data = timeTables.getTimeTablesList();
+    if (data.size() < 1)
+    {
+        JOptionPane.showMessageDialog(this, "no data found");
+        return;
+    }
+    ArrayList<String> values = new ArrayList();
+    for (var v : data)
+    {
+        values.add(timeTables.toPlainString(v) + "["+v+"]");
+    }
+    var r = JOptionPane.showInputDialog(this, "select one", "Select",
+            JOptionPane.QUESTION_MESSAGE, null, values.toArray(), null);
+    if (r == null)
+        return;
+    String result = r.toString();
+    String id = result.substring(result.indexOf('[')+1, result.indexOf(']'));
+        initTableData(timeTables.fetchParticularTimeTable(id));
+    }//GEN-LAST:event_jLoadButtonActionPerformed
+    
     void applyFastSelection()
     {
         allFacSubDetailsList.forEach(v->v.resetLect());
@@ -1413,6 +1515,7 @@ FastSelection fastSelection;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JList<String> jList1;
+    private javax.swing.JButton jLoadButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

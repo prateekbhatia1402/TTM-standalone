@@ -20,7 +20,7 @@ public static final int PERSONAL_DETAILS_PAGE=0;
 public static final int PARENT_DETAILS_PAGE=2;
 private Student student;
 private boolean editMode=false;
-private String roleOfUser;
+private role roleOfUser;
 private void setDetails(Student student){
     System.out.println("P ID "+student.getParentId());
     ParentDetails parents=ParentDetailsControl.getParentDetails(student.getParentId());
@@ -207,7 +207,7 @@ private void setComponentsEnabled(boolean val){
         jTabbedPane1.setEnabledAt(1,false);
         jTabbedPane1.setEnabledAt(2,false);
         setComponentsEnabled(false);
-        roleOfUser=LoginF.USER_ROLE;
+        roleOfUser = LoginF.getUserRole();
         //jLabel1.setText("<html><U><B>Student Details</B></U></html>");
     }
     public StudentDetails(Student student) {
@@ -216,7 +216,7 @@ private void setComponentsEnabled(boolean val){
         System.out.println(student.getRegistrationId()+"  "+student.getStudentName());
         jTabbedPane1.setEnabledAt(1,false);
         jTabbedPane1.setEnabledAt(2,false);
-        roleOfUser=LoginF.USER_ROLE;
+        roleOfUser=LoginF.getUserRole();
         setComponentsEnabled(false);
         setDetails(student);
         jST_SubmitButton.setVisible(false);
@@ -229,7 +229,7 @@ private void setComponentsEnabled(boolean val){
         jTabbedPane1.setEnabledAt(1,false);
         jTabbedPane1.setEnabledAt(2,false);
         setComponentsEnabled(false);
-        roleOfUser=LoginF.USER_ROLE;
+        roleOfUser=LoginF.getUserRole();
         setDetails(student);
         jST_SubmitButton.setVisible(false);
     }
@@ -1257,11 +1257,10 @@ private void setModeChanges()
     }//GEN-LAST:event_jButton3MouseClicked
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-if(roleOfUser.toLowerCase().equals("admin") || roleOfUser.toLowerCase().equals("faculty"))
+if(roleOfUser != role.STUDENT)
     StudentSearch.getStudentSearch();
-else if(roleOfUser.toLowerCase().equals("student"))
+else
     Studenthomescreen.getStudenthomescreen();
-else System.exit(5);
         this.dispose();// TODO add your handling code here:
     }//GEN-LAST:event_jButton5ActionPerformed
 

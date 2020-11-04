@@ -31,6 +31,7 @@ final class TimeTables
     HashMap<String,TimeTable> tables ;
     String latest = "";
     String current = "";
+    String lastFetched = "";
     
     public String getClassId() {
         return classId;
@@ -185,6 +186,7 @@ final class TimeTables
         } catch (SQLException ex) {
             Logger.getLogger(TimeTables.class.getName()).log(Level.SEVERE, null, ex);
         }
+        lastFetched = current;
         return fetchParticularTimeTable(current);
     }
     
@@ -268,6 +270,7 @@ final class TimeTables
         timeTable.setSchedule(schedule);
          }
             //System.out.println("Returning Latest TT : "+LocalDateTime.now());
+        lastFetched = latest;
         return timeTable.getSchedule();
     }
     
@@ -332,6 +335,7 @@ final class TimeTables
             }
         timeTable.setSchedule(schedule);
          }
+        lastFetched = latest;
         return timeTable.getSchedule();
     }
     
@@ -377,6 +381,7 @@ final class TimeTables
         timeTable.setSchedule(schedule);
         }
             //System.out.println("Returning TT : "+LocalDateTime.now());
+            lastFetched = tid;
         return timeTable.schedule;
     }
 }
@@ -640,7 +645,12 @@ public class TimeTableControl {/*
         return -1;
     }
     
-    public static void createTimeTable(ArrayList<Schedule> schedule){
+    public static void createTimeTable(ArrayList<Schedule> schedule)
+    {
+        createTimeTable(schedule, LocalDate.now().plusDays(1));
+    }
+    
+    public static void createTimeTable(ArrayList<Schedule> schedule, LocalDate wef){
         Connection con=null;
         try{
             con=SqlConnect.getDatabaseConnection();
@@ -684,7 +694,7 @@ public class TimeTableControl {/*
             psInsert.setString(4, scheduleItem.getSubjectId());
             psInsert.setString(5, scheduleItem.getFacultyId());
             psInsert.setInt(6, scheduleItem.getRoomId());
-            psInsert.setString(7, LocalDate.now().atStartOfDay().plusDays(1).
+            psInsert.setString(7, wef.
                             format(DateTimeFormatter.BASIC_ISO_DATE));
             psInsert.setString(8, LocalDate.now().atStartOfDay().
                             format(DateTimeFormatter.BASIC_ISO_DATE));

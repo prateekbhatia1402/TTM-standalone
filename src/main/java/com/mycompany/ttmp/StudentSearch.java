@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
  * @author User
  */
 public class StudentSearch extends javax.swing.JFrame {
-private final String roleOfUser;
+private final role roleOfUser;
 DefaultTableModel tableModel;
 private Student[] students;
 private static StudentSearch singleInstance=null;
@@ -23,8 +23,8 @@ private static StudentSearch singleInstance=null;
     private StudentSearch() {
         initComponents();
         tableModel=(DefaultTableModel)jTable1.getModel();
-        roleOfUser=LoginF.USER_ROLE;
-        if(roleOfUser.equals("admin") || roleOfUser.equals("faculty")){
+        roleOfUser=LoginF.getUserRole();
+        if(roleOfUser == role.ADMIN || roleOfUser == role.FACULTY){
            jTable1.setToolTipText("Hold ALT and click on the Entry whose Detail You want to View");
         }
         displayRecords(StudentControl.search());
@@ -240,20 +240,27 @@ else jSearchButton.setEnabled(false);  */ // TODO add your handling code here:
     }//GEN-LAST:event_jSearchFieldKeyReleased
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-if(roleOfUser.equals("admin"))
-    Adminhomescreen.getAdminhomescreen();
-else if(roleOfUser.equals("faculty"))
-    Facultyhomescreen.getFacultyhomescreen();
-else if(roleOfUser.equals("student"))
-    Studenthomescreen.getStudenthomescreen();
-else
+if( null == roleOfUser)
     System.exit(0);
+else switch (roleOfUser) {
+        case ADMIN:
+            Adminhomescreen.getAdminhomescreen();
+            break;
+        case FACULTY:
+            Facultyhomescreen.getFacultyhomescreen();
+            break;
+        case STUDENT:
+            Studenthomescreen.getStudenthomescreen();
+            break;
+        default:
+            System.exit(0);
+    }
     this.dispose();
         
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-    if((roleOfUser.equals("admin") || roleOfUser.equals("faculty")) && evt.isAltDown())
+    if((roleOfUser == role.ADMIN || roleOfUser == role.FACULTY) && evt.isAltDown())
     {
     int row=jTable1.getSelectedRow();
     if(row<0)return;

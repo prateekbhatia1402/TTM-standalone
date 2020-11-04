@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class ClassManager extends javax.swing.JFrame {
     DefaultTableModel tableModel;
-    String roleOfUser;
+    role roleOfUser;
     int selectedRow=-1;
     boolean readyForModify=false;
     /**
@@ -21,8 +21,8 @@ public class ClassManager extends javax.swing.JFrame {
     //I_Class[] classes;
      public ClassManager() {
         initComponents();
-        roleOfUser=LoginF.USER_ROLE;
-        if(!roleOfUser.toLowerCase().equals("admin"))
+        roleOfUser=LoginF.getUserRole();
+        if(roleOfUser != role.ADMIN)
         {
             jButton1.setEnabled(false);
             jButton2.setEnabled(false);
@@ -447,7 +447,7 @@ int selectedIndex = -1;
     }
     ArrayList<String> options = new ArrayList<>();
     options.add("Update / View subject & Faculty assignment");
-    if (roleOfUser.equalsIgnoreCase("admin"))
+    if (roleOfUser == role.ADMIN)
     {
         options.add("Update class");
         if (!tableModel.getValueAt(selectedIndex, 3).toString().equalsIgnoreCase("NOT ASSIGNED"))
@@ -509,9 +509,9 @@ else if (value.equalsIgnoreCase("update / View subject & Faculty assignment"))
     private void modifyClass(){
         if(readyForModify){
             String classId=""+tableModel.getValueAt(selectedRow,1);
-            if(roleOfUser.toLowerCase().equals("admin"))
+            if(roleOfUser == role.ADMIN)
                new TeacherSub(classId,TeacherSub.READ_MODE,TeacherSub.CREATE_OR_EDIT_MODE).setVisible(true);
-            else if(roleOfUser.toLowerCase().equals("faculty"))
+            else if(roleOfUser == role.FACULTY)
                new TeacherSub(classId,TeacherSub.READ_MODE,TeacherSub.READ_MODE).setVisible(true);
             readyForModify=false;
                           }
