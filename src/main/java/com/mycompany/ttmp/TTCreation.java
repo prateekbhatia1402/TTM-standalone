@@ -186,7 +186,8 @@ import com.mycompany.ttmp.Utility;
 
     @Override
     public String toString() {
-        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq=" + lectReq + ", lectAssigned=" + lectAssigned + '}';
+        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq=" + 
+                lectReq + ", lectAssigned=" + lectAssigned + '}';
     }
 
         public void setFacId(String facId) {

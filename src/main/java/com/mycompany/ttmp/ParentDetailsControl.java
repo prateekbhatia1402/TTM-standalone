@@ -20,10 +20,10 @@ public class ParentDetailsControl {
  private static final String TABLE_NAME="`parent details`";
  private static final String[] COLUMN_NAMES_PLN = 
  {
-    "`PARENT ID`","`STUDENT REGISTRATION ID`","`FATHER NAME`",
-    "`FATHER EMAIL ID`","`FATHER MOBILE NUMBER`","`FATHER DOB`",
-    "`MOTHER NAME`","`MOTHER EMAIL`","`MOTHER MOBILE NUMBER`",
-    "`MOTHER DOB`","`FAMILY INCOME`"
+    "PARENT ID","STUDENT REGISTRATION ID","FATHER NAME",
+    "FATHER EMAIL ID","FATHER MOBILE NUMBER","FATHER DOB",
+    "MOTHER NAME","MOTHER EMAIL","MOTHER MOBILE NUMBER",
+    "MOTHER DOB","FAMILY INCOME"
  };
  private static final String[] COLUMN_NAMES = 
  {
@@ -97,6 +97,7 @@ public class ParentDetailsControl {
         String query=getSelectFullStatement(parentId);
         try (Connection con=SqlConnect.getDatabaseConnection()){
             Statement st=con.createStatement();
+            System.out.println(query);
             ResultSet rs=st.executeQuery(query);
             /*
             
@@ -114,7 +115,7 @@ public class ParentDetailsControl {
                 String motherName=rs.getString(COLUMN_NAMES_PLN[6]);
                 String motherEmail=rs.getString(COLUMN_NAMES_PLN[7]);
                 String motherMobile=rs.getString(COLUMN_NAMES_PLN[8]);
-                Date motherDob=new Date(rs.getDate(COLUMN_NAMES_PLN[8]));
+                Date motherDob=new Date(rs.getDate(COLUMN_NAMES_PLN[9]));
                 String familyIncome=rs.getString(COLUMN_NAMES_PLN[10]);
                 parentDetails=ParentDetails.createParentDetails(parentId, fatherName,
                         fatherEmail, fatherMobile, fatherDob,motherName,

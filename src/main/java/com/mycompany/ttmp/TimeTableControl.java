@@ -381,29 +381,7 @@ final class TimeTables
     }
 }
 
-public class TimeTableControl {/*
-    public static I_Class[] getUnassignedClasses(){
-        I_Class[] classes=null;
-        try(Connection con=SqlConnect.getDatabaseConnection()) {
-            Statement st=con.createStatement();
-            ResultSet rs=st.executeQuery("select id,name from class where id not in"
-                    + " (select distinct `class id` from schedule)");
-            if(rs.last()==false)
-                return null;
-            int count=rs.getRow();
-            rs.first();
-            classes=new I_Class[count];
-            for(int i=0;i<count;i++,rs.next()){
-                String id=rs.getString("id");
-                String name=rs.getString("name");
-                classes[i]=new I_Class(id,name);
-            }
-                    
-        } catch (SQLException ex) {
-            Logger.getLogger(TimeTableControl.class. getName()).log(Level.SEVERE, null, ex);
-        }
-        return classes;
-    }*/
+public class TimeTableControl {
      public static I_Class[] getClasses(){
         I_Class[] classes=null;
         try(Connection con=SqlConnect.getDatabaseConnection()) {
@@ -571,7 +549,7 @@ public class TimeTableControl {/*
             ////System.out.println(query);
             ResultSet rs=st.executeQuery(query);
             if (rs.last() == false)
-                return null;
+                return schedule;
             int count=rs.getRow();
             rs.first();
             for(int i=0;i<count;i++,rs.next()){

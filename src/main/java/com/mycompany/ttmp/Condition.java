@@ -10,15 +10,8 @@ import java.util.HashMap;
 import javax.swing.DefaultListModel;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author devga
- */
 public class Condition extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Condition
-     */
     enum Mode
     {
         EDIT, VIEW
