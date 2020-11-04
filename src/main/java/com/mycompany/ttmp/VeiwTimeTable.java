@@ -28,9 +28,10 @@ public class VeiwTimeTable extends javax.swing.JFrame {
     private ArrayList<Object[]> listSearchData; 
     private String [][] timeTable;
     private String [][] myTimeTable;
+    private String selectedTid;
     private String myId;
     private HashMap<String,Object> cellInfo = new HashMap<>();
-    private final String roleOfUser=LoginF.USER_ROLE;
+    private final role roleOfUser=LoginF.getUserRole();
     private String timeTableOf;
     DefaultListModel<String> listModel;
     TimeTables timeTables;
@@ -62,16 +63,20 @@ public class VeiwTimeTable extends javax.swing.JFrame {
     
     public VeiwTimeTable() {
         initComponents();
-        jSubmitButton1.setVisible(false);
+        if (roleOfUser != role.ADMIN)
+        {
+            jUseForCreationButton.setVisible(false);
+        }
+        jUseForCreationButton.setEnabled(false);
         initVariables();
     }
     public VeiwTimeTable(String id ) {
         initComponents();
-        jSubmitButton1.setVisible(false);
         initVariables();           
-        if(roleOfUser.equalsIgnoreCase("admin"))
+        if(roleOfUser == role.ADMIN)
         {
             myId=id;
+            jUseForCreationButton.setVisible(false);
         //System.out.println(id);
         jTextField1.setText("my table");
         myTimeTable=new String[days.length][periods.length];
@@ -85,35 +90,35 @@ public class VeiwTimeTable extends javax.swing.JFrame {
             changeInProcess = true;
             if (id.startsWith("C"))
             {
-                //System.out.println("Class TT is requested : "+LocalDateTime.now());
                 if (timeTables == null || !timeTables.getClassId().equals(id))
                 {
-                    //System.out.println("New Class is selected : "+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
                     timeTables = TimeTableControl.getTimeTablesList(id);
-                    //System.out.println("Got TimeTablesList : "+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                    jUseForCreationButton.setEnabled(true);
                     updateTable(timeTables.fetchTimeTable(), id);
-                    //System.out.println("DisplayedTimeTable : "+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
                     jVersionBox.removeAllItems();
                     timeTablesList = timeTables.getTimeTablesList();
-                    //System.out.println("Got TT's as List : "+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
                     timeTablesList.forEach(val -> {
                         String v ;
                         v = timeTables.toPlainString(val);
+                        if (roleOfUser == role.ADMIN)
+                            v += "["+ val +"]";
                         jVersionBox.addItem(v);
                     });
-                    //System.out.println("FilledVersionBox : "+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
                     if (timeTablesList.size() > 1)
                         jVersionBox.setVisible(true);
                     else
+                    {
+                        if (timeTablesList.isEmpty())
+                            jUseForCreationButton.setEnabled(false);
                         jVersionBox.setVisible(false);
+                    }
                 }
             }
             else 
             {
-                //System.out.println("Faculty TT is requested : "+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                jUseForCreationButton.setEnabled(false);
                 jVersionBox.setVisible(false);
                 updateTable(TimeTableControl.getFacultyTimeTable(id),id);
-                //System.out.println("Displayed TT : "+LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
             }
             changeInProcess = false;
         }
@@ -197,9 +202,8 @@ public class VeiwTimeTable extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTimeTable = new javax.swing.JTable();
-        jSubmitButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        jSubmitButton1 = new javax.swing.JButton();
+        jUseForCreationButton = new javax.swing.JButton();
         jTableOfLabel = new javax.swing.JLabel();
         jVersionBox = new javax.swing.JComboBox<>();
         jPanel4 = new javax.swing.JPanel();
@@ -316,23 +320,15 @@ public class VeiwTimeTable extends javax.swing.JFrame {
         jTimeTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane3.setViewportView(jTimeTable);
 
-        jSubmitButton.setFont(new java.awt.Font("Cambria", 0, 18)); // NOI18N
-        jSubmitButton.setText("OK");
-        jSubmitButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jSubmitButtonActionPerformed(evt);
-            }
-        });
-
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 48)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Time Table");
 
-        jSubmitButton1.setFont(new java.awt.Font("Cambria", 0, 18)); // NOI18N
-        jSubmitButton1.setText("OK");
-        jSubmitButton1.addActionListener(new java.awt.event.ActionListener() {
+        jUseForCreationButton.setFont(new java.awt.Font("Cambria", 0, 18)); // NOI18N
+        jUseForCreationButton.setText("Use For Creation");
+        jUseForCreationButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jSubmitButton1ActionPerformed(evt);
+                jUseForCreationButtonActionPerformed(evt);
             }
         });
 
@@ -359,9 +355,7 @@ public class VeiwTimeTable extends javax.swing.JFrame {
                 .addGap(32, 32, 32))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addGap(52, 52, 52)
-                .addComponent(jSubmitButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(240, 240, 240)
-                .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jUseForCreationButton, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 1040, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -379,11 +373,9 @@ public class VeiwTimeTable extends javax.swing.JFrame {
                         .addGap(21, 21, 21)
                         .addComponent(jVersionBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jSubmitButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jUseForCreationButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -481,13 +473,10 @@ public class VeiwTimeTable extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jSubmitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSubmitButtonActionPerformed
- 
-    }//GEN-LAST:event_jSubmitButtonActionPerformed
-
-    private void jSubmitButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSubmitButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jSubmitButton1ActionPerformed
+    private void jUseForCreationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUseForCreationButtonActionPerformed
+       new TTCreation(timeTables, timeTables.lastFetched).setVisible(true);
+       this.dispose();
+    }//GEN-LAST:event_jUseForCreationButtonActionPerformed
 
     private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
         jVersionBox.setVisible(false);
@@ -530,7 +519,7 @@ public class VeiwTimeTable extends javax.swing.JFrame {
         return;
     }
     if(val.equalsIgnoreCase("my table")){
-        if(roleOfUser.equalsIgnoreCase("admin")==false)
+        if(roleOfUser != role.ADMIN)
         {
             if(myId.contains("C"))
             timeTableOf=ClassControl.getClass(myId).getName();
@@ -550,14 +539,21 @@ public class VeiwTimeTable extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1KeyReleased
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        if(roleOfUser.equals("admin"))
-    Adminhomescreen.getAdminhomescreen();
-else if(roleOfUser.equals("faculty"))
-    Facultyhomescreen.getFacultyhomescreen();
-else if(roleOfUser.equals("student"))
-    Studenthomescreen.getStudenthomescreen();
-else
-    System.exit(0);
+        if(null == roleOfUser)
+            System.exit(0);
+else    switch (roleOfUser) {
+            case ADMIN:
+                Adminhomescreen.getAdminhomescreen();
+                break;
+            case FACULTY:
+                Facultyhomescreen.getFacultyhomescreen();
+                break;
+            case STUDENT:
+                Studenthomescreen.getStudenthomescreen();
+                break;
+            default:
+                System.exit(0);
+        }
     this.dispose();
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -736,11 +732,10 @@ else
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JButton jSubmitButton;
-    private javax.swing.JButton jSubmitButton1;
     private javax.swing.JLabel jTableOfLabel;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTable jTimeTable;
+    private javax.swing.JButton jUseForCreationButton;
     private javax.swing.JComboBox<String> jVersionBox;
     // End of variables declaration//GEN-END:variables
 }

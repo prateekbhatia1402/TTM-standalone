@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
  * @author User
  */
 public class FacultySearch extends javax.swing.JFrame {
-private String roleOfUser;
+private role roleOfUser;
 DefaultTableModel tableModel;
 private Faculty[] faculties; 
 private static FacultySearch singleInstance=null;
@@ -23,8 +23,8 @@ private static FacultySearch singleInstance=null;
     private FacultySearch() {
         initComponents();
         tableModel=(DefaultTableModel)jTable1.getModel();
-        roleOfUser=LoginF.USER_ROLE;
-        if(roleOfUser.equals("admin"))
+        roleOfUser=LoginF.getUserRole();
+        if(roleOfUser == role.ADMIN)
             jTable1.setToolTipText("Hold ALT and click on the Entry whose Detail You want to View");
         displayRecords(FacultyControl.search());
                             }
@@ -239,11 +239,11 @@ else jSearchButton.setEnabled(false);  */ // TODO add your handling code here:
     }//GEN-LAST:event_jSearchFieldKeyReleased
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if(roleOfUser.equals("admin"))
+        if(roleOfUser == role.ADMIN)
             Adminhomescreen.getAdminhomescreen();
-        else if(roleOfUser.equals("faculty"))
+        else if(roleOfUser == role.FACULTY)
             Facultyhomescreen.getFacultyhomescreen();
-        else if(roleOfUser.equals("student"))
+        else if(roleOfUser == role.STUDENT)
             Studenthomescreen.getStudenthomescreen();
         else
             System.exit(0);
@@ -251,7 +251,7 @@ else jSearchButton.setEnabled(false);  */ // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-if( roleOfUser.equals("admin") && evt.isAltDown() )
+if( roleOfUser == role.ADMIN && evt.isAltDown() )
 {
     int row=jTable1.getSelectedRow();
     if(row<0)

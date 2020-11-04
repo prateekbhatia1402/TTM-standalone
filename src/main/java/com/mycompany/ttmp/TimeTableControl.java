@@ -31,6 +31,7 @@ final class TimeTables
     HashMap<String,TimeTable> tables ;
     String latest = "";
     String current = "";
+    String lastFetched = "";
     
     public String getClassId() {
         return classId;
@@ -185,6 +186,7 @@ final class TimeTables
         } catch (SQLException ex) {
             Logger.getLogger(TimeTables.class.getName()).log(Level.SEVERE, null, ex);
         }
+        lastFetched = current;
         return fetchParticularTimeTable(current);
     }
     
@@ -268,6 +270,7 @@ final class TimeTables
         timeTable.setSchedule(schedule);
          }
             //System.out.println("Returning Latest TT : "+LocalDateTime.now());
+        lastFetched = latest;
         return timeTable.getSchedule();
     }
     
@@ -332,6 +335,7 @@ final class TimeTables
             }
         timeTable.setSchedule(schedule);
          }
+        lastFetched = latest;
         return timeTable.getSchedule();
     }
     
@@ -377,6 +381,7 @@ final class TimeTables
         timeTable.setSchedule(schedule);
         }
             //System.out.println("Returning TT : "+LocalDateTime.now());
+            lastFetched = tid;
         return timeTable.schedule;
     }
 }
