@@ -17,7 +17,7 @@ public class FacultyDetails extends javax.swing.JFrame {
     Faculty faculty;
     public static final int QUALIFICATION_PAGE=2;
     public static final int PERSONAL_DETAIL_PAGE=0;
-    private String roleOfUser;
+    private role roleOfUser;
     
     private void setDetails(Faculty faculty){
     System.out.println("F ID "+faculty.getFacultyId());
@@ -166,7 +166,7 @@ private void setComponentsEnabled(boolean val){
     public FacultyDetails(Faculty faculty) {
         initComponents();
         this.faculty=faculty;
-        roleOfUser=LoginF.USER_ROLE;
+        roleOfUser = LoginF.getUserRole();
         System.out.println(faculty.getFacultyId()+"  "+faculty.getName());
         jTabbedPane1.setEnabledAt(0,false);
         jTabbedPane1.setEnabledAt(1,false);
@@ -181,7 +181,7 @@ private void setComponentsEnabled(boolean val){
     }
     public FacultyDetails(Faculty faculty,int initIndex) {
         initComponents();
-        roleOfUser=LoginF.USER_ROLE;
+        roleOfUser = LoginF.getUserRole();
         jTabbedPane1.setSelectedIndex(initIndex);
         this.faculty=faculty;
         System.out.println(faculty.getFacultyId()+"  "+faculty.getName());
@@ -986,9 +986,9 @@ private void setComponentsEnabled(boolean val){
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-if(roleOfUser.equals("admin"))
+if(roleOfUser == role.ADMIN)
     FacultySearch.getFacultySearch();
-else if(roleOfUser.equals("faculty"))
+else if(roleOfUser == role.FACULTY)
     Facultyhomescreen.getFacultyhomescreen();
 else
     System.exit(0);

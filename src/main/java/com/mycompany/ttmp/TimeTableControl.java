@@ -31,6 +31,7 @@ final class TimeTables
     HashMap<String,TimeTable> tables ;
     String latest = "";
     String current = "";
+    String lastFetched = "";
     
     public String getClassId() {
         return classId;
@@ -185,6 +186,7 @@ final class TimeTables
         } catch (SQLException ex) {
             Logger.getLogger(TimeTables.class.getName()).log(Level.SEVERE, null, ex);
         }
+        lastFetched = current;
         return fetchParticularTimeTable(current);
     }
     
@@ -268,6 +270,7 @@ final class TimeTables
         timeTable.setSchedule(schedule);
          }
             //System.out.println("Returning Latest TT : "+LocalDateTime.now());
+        lastFetched = latest;
         return timeTable.getSchedule();
     }
     
@@ -332,6 +335,7 @@ final class TimeTables
             }
         timeTable.setSchedule(schedule);
          }
+        lastFetched = latest;
         return timeTable.getSchedule();
     }
     
@@ -377,11 +381,34 @@ final class TimeTables
         timeTable.setSchedule(schedule);
         }
             //System.out.println("Returning TT : "+LocalDateTime.now());
+            lastFetched = tid;
         return timeTable.schedule;
     }
 }
 
-public class TimeTableControl {
+public class TimeTableControl {/*
+    public static I_Class[] getUnassignedClasses(){
+        I_Class[] classes=null;
+        try(Connection con=SqlConnect.getDatabaseConnection()) {
+            Statement st=con.createStatement();
+            ResultSet rs=st.executeQuery("select id,name from class where id not in"
+                    + " (select distinct `class id` from schedule)");
+            if(rs.last()==false)
+                return null;
+            int count=rs.getRow();
+            rs.first();
+            classes=new I_Class[count];
+            for(int i=0;i<count;i++,rs.next()){
+                String id=rs.getString("id");
+                String name=rs.getString("name");
+                classes[i]=new I_Class(id,name);
+            }
+                    
+        } catch (SQLException ex) {
+            Logger.getLogger(TimeTableControl.class. getName()).log(Level.SEVERE, null, ex);
+        }
+        return classes;
+    }*/
      public static I_Class[] getClasses(){
         I_Class[] classes=null;
         try(Connection con=SqlConnect.getDatabaseConnection()) {
@@ -549,7 +576,7 @@ public class TimeTableControl {
             ////System.out.println(query);
             ResultSet rs=st.executeQuery(query);
             if (rs.last() == false)
-                return schedule;
+                return null;
             int count=rs.getRow();
             rs.first();
             for(int i=0;i<count;i++,rs.next()){
@@ -618,7 +645,12 @@ public class TimeTableControl {
         return -1;
     }
     
-    public static void createTimeTable(ArrayList<Schedule> schedule){
+    public static void createTimeTable(ArrayList<Schedule> schedule)
+    {
+        createTimeTable(schedule, LocalDate.now().plusDays(1));
+    }
+    
+    public static void createTimeTable(ArrayList<Schedule> schedule, LocalDate wef){
         Connection con=null;
         try{
             con=SqlConnect.getDatabaseConnection();
@@ -662,7 +694,7 @@ public class TimeTableControl {
             psInsert.setString(4, scheduleItem.getSubjectId());
             psInsert.setString(5, scheduleItem.getFacultyId());
             psInsert.setInt(6, scheduleItem.getRoomId());
-            psInsert.setString(7, LocalDate.now().atStartOfDay().plusDays(1).
+            psInsert.setString(7, wef.
                             format(DateTimeFormatter.BASIC_ISO_DATE));
             psInsert.setString(8, LocalDate.now().atStartOfDay().
                             format(DateTimeFormatter.BASIC_ISO_DATE));
