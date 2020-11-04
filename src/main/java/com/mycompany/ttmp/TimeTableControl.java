@@ -645,7 +645,12 @@ public class TimeTableControl {/*
         return -1;
     }
     
-    public static void createTimeTable(ArrayList<Schedule> schedule){
+    public static void createTimeTable(ArrayList<Schedule> schedule)
+    {
+        createTimeTable(schedule, LocalDate.now().plusDays(1));
+    }
+    
+    public static void createTimeTable(ArrayList<Schedule> schedule, LocalDate wef){
         Connection con=null;
         try{
             con=SqlConnect.getDatabaseConnection();
@@ -689,7 +694,7 @@ public class TimeTableControl {/*
             psInsert.setString(4, scheduleItem.getSubjectId());
             psInsert.setString(5, scheduleItem.getFacultyId());
             psInsert.setInt(6, scheduleItem.getRoomId());
-            psInsert.setString(7, LocalDate.now().atStartOfDay().plusDays(1).
+            psInsert.setString(7, wef.
                             format(DateTimeFormatter.BASIC_ISO_DATE));
             psInsert.setString(8, LocalDate.now().atStartOfDay().
                             format(DateTimeFormatter.BASIC_ISO_DATE));

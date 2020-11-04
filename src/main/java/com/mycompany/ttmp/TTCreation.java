@@ -187,7 +187,8 @@ import java.util.Arrays;
 
     @Override
     public String toString() {
-        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq=" + lectReq + ", lectAssigned=" + lectAssigned + '}';
+        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq=" + 
+                lectReq + ", lectAssigned=" + lectAssigned + '}';
     }
 
         public void setFacId(String facId) {
@@ -448,10 +449,19 @@ public class TTCreation extends javax.swing.JFrame {
     }
     public TTCreation() {
         initComponents();
+        jLoadButton.setVisible(false);
         roleOfUser=LoginF.getUserRole();
         jFacultySelectButton.setEnabled(false);
         jSubmitButton.setEnabled(false);
-        jFastSelectButton.setEnabled(false);
+        jFastSelectButton.setEnabled
+        
+        
+        
+        
+        
+        
+        
+        (false);
         classes=TimeTableControl.getClasses();
         jClassBox.removeAllItems();
         jClassBox.addItem("select class");
@@ -463,7 +473,7 @@ public class TTCreation extends javax.swing.JFrame {
         jTimeTable.setEnabled(false);
     }
     
-    public TTCreation(TimeTables timeTables, String tid) {
+    TTCreation(TimeTables timeTables, String tid) {
         initComponents();
         roleOfUser=LoginF.getUserRole();
         jFacultySelectButton.setEnabled(false);
@@ -482,13 +492,14 @@ public class TTCreation extends javax.swing.JFrame {
             if (timeTables.classId.equals(classe.getId()))
                 svalue = value;
         }
-        jClassSelectButton.setEnabled(false);
+        jClassSelectButton.setVisible(false);
         jClassBox.setSelectedItem(svalue);
         jClassBox.setEnabled(false);
         jClearSelectionButton.setEnabled(false);
         jTimeTable.setEnabled(false);
         initTables(tid);
     }
+    
     private boolean requirementsMet(ArrayList<FacSub> facSubList)
     {
       return  facSubList.stream().allMatch(v -> (v.meetsRequirements()));
