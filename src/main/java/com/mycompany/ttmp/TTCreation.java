@@ -349,7 +349,7 @@ public class TTCreation extends javax.swing.JFrame {
         timeTableModel.setRowCount(0);
         timeTableModel.setColumnCount(0);
         subjectTableModel=(DefaultTableModel)jSubjectAllotedTable.getModel();
-        timeTableModel.addColumn("DAY \\ TIME");
+        timeTableModel.addColumn("Day\\Time");
         listModel=new DefaultListModel<>();
         jList1.setModel(listModel);
         for (TimeSlot period : periods) {
@@ -366,6 +366,12 @@ public class TTCreation extends javax.swing.JFrame {
 //        System.out.println(subjects.length);
         var v = TimeTableControl.getFacultySubjectDetails(selectedClass.getId(),
                 LocalDate.now().atStartOfDay().plusDays(1).toLocalDate(), null);
+        if(v==null || v.isEmpty()){
+            JOptionPane.showMessageDialog(this,"Subjects and teachers have not been assigned for this class,\n"
+                    + " please do that using classroom manager before proceeding");
+            leavePage();
+            return;
+        }
         for (int i = 0; i < v.size(); i++)
         {
             var f = new FacSub(i, v.get(i));
@@ -373,12 +379,6 @@ public class TTCreation extends javax.swing.JFrame {
             allFacSubDetailsMap.put(f.getSubId(), f);
             allFacSubDetailsMap.put(f.getFacId(), f);
             allFacSubDetailsList.add(f);
-        }
-        if(allFacSubDetailsMap==null || allFacSubDetailsMap.isEmpty()){
-            JOptionPane.showMessageDialog(this,"Subjects and teachers have not been assigned for this class,\n"
-                    + " please do that using classroom manager before proceeding");
-            leavePage();
-            return;
         }
             
         System.out.println(subjectTableModel.getRowCount());
@@ -404,7 +404,7 @@ public class TTCreation extends javax.swing.JFrame {
             System.out.println(day.getDayId() + " " + day.getDayName());
             timeTableModel.addRow(new Object[]{day.getDayName()});
         }
-            
+    
         subjectTableModel.setRowCount(0);
         allFacSubDetailsList.forEach(facSub -> {
             facSub.resetLect();
@@ -443,7 +443,7 @@ public class TTCreation extends javax.swing.JFrame {
             timeTable[day][period]=fac_sub;
             increaseSubCount(subjectId);
         timeTableModel.setValueAt(
-                Utility.colorCodeValue(facName + " " + subjectName,
+                Utility.colorCodeValue(facName + "<br>" + subjectName,
                         facSub.getColor()), day, period+1);
         }
     }
@@ -453,14 +453,7 @@ public class TTCreation extends javax.swing.JFrame {
         roleOfUser=LoginF.getUserRole();
         jFacultySelectButton.setEnabled(false);
         jSubmitButton.setEnabled(false);
-        jFastSelectButton.setEnabled
-        
-        
-        
-        
-        
-        
-        
+        jFastSelectButton.setEnabled      
         (false);
         classes=TimeTableControl.getClasses();
         jClassBox.removeAllItems();
@@ -812,7 +805,7 @@ public class TTCreation extends javax.swing.JFrame {
     {
         timeTable[day][period] = facSub.getFacId()+"_"+facSub.getSubId();
         increaseSubCount(facSub.getSubId());
-        String val = facSub.getFacName()+" "+facSub.getSubName();
+        String val = facSub.getFacName()+"<br>"+facSub.getSubName();
         timeTableModel.setValueAt(Utility.colorCodeValue(val, facSub.getColor()),
                 day, period + 1);
     }
@@ -827,6 +820,26 @@ public class TTCreation extends javax.swing.JFrame {
             availableFacSubDetailsList.add(v);
         }
         listModel.addElement("FREE");
+    }
+    ArrayList<FacSub> availableFacSubDetailsCopy;
+    private void updateList(String searchTerm){
+        if(allFacSubDetailsList == null || allFacSubDetailsList.isEmpty())
+            return;
+        availableFacSubDetailsList.clear();
+        searchTerm = searchTerm.toLowerCase();
+        for(var v : allFacSubDetailsList)
+        {
+            if(v.getSubName().toLowerCase().contains(searchTerm) ||
+                    v.getFacName().toLowerCase().contains(searchTerm) ||
+                    v.getSubId().toLowerCase().contains(searchTerm))
+            {
+                listModel.addElement(Utility.colorCodeValue(v.getFacName()+"("+v.getFacId()+") : "+
+                    v.getSubName(), v.getColor()));
+                availableFacSubDetailsList.add(v);
+            }
+        }
+        if ("free".contains(searchTerm))
+            listModel.addElement("FREE");
     }
     private void updateList(String dayId, String timeSlotId){
         
@@ -895,6 +908,11 @@ public class TTCreation extends javax.swing.JFrame {
                 jTextField1ActionPerformed(evt);
             }
         });
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTextField1KeyTyped(evt);
+            }
+        });
 
         jList1.setBackground(new java.awt.Color(153, 153, 153));
         jList1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -958,13 +976,14 @@ public class TTCreation extends javax.swing.JFrame {
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, true, false
+                false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
+        jTimeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
         jTimeTable.setRowHeight(28);
         jTimeTable.getTableHeader().setReorderingAllowed(false);
         jTimeTable.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1055,26 +1074,30 @@ public class TTCreation extends javax.swing.JFrame {
                 .addComponent(jClearSelectionButton)
                 .addGap(35, 35, 35)
                 .addComponent(jClearAllButton)
-                .addGap(113, 113, 113)
+                .addGap(61, 61, 61)
                 .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42)
-                .addComponent(jButton1)
                 .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLoadButton)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(134, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(38, 38, 38)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jClearSelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jFacultySelectButton)
                     .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1)
-                    .addComponent(jClearAllButton)
-                    .addComponent(jLoadButton))
+                    .addComponent(jClearAllButton))
                 .addGap(25, 25, 25))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jLoadButton))
+                .addGap(43, 43, 43))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -1084,21 +1107,20 @@ public class TTCreation extends javax.swing.JFrame {
             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3))
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addComponent(jScrollPane4)
+            .addComponent(jScrollPane3)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 65, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(11, 11, 11)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -1225,7 +1247,7 @@ else
        }
        else{
            jClearSelectionButton.setEnabled(true);
-       }
+            }
     }//GEN-LAST:event_jTimeTableMouseClicked
    
     private void increaseSubCount(String subjectId){
@@ -1437,6 +1459,23 @@ FastSelection fastSelection;
     String id = result.substring(result.indexOf('[')+1, result.indexOf(']'));
         initTableData(timeTables.fetchParticularTimeTable(id));
     }//GEN-LAST:event_jLoadButtonActionPerformed
+
+    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
+    String val = jTextField1.getText();
+    listModel.clear();
+    if (val.isBlank())
+    {
+        availableFacSubDetailsList = availableFacSubDetailsCopy;
+        updateList();
+    }
+    else {
+        if (val.length() == 1)
+        {
+            availableFacSubDetailsCopy = new ArrayList(availableFacSubDetailsList);
+        }
+        updateList(val);
+    }
+    }//GEN-LAST:event_jTextField1KeyTyped
     
     void applyFastSelection()
     {
