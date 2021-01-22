@@ -576,7 +576,7 @@ public class TimeTableControl {/*
             ////System.out.println(query);
             ResultSet rs=st.executeQuery(query);
             if (rs.last() == false)
-                return null;
+                return new ArrayList<>();
             int count=rs.getRow();
             rs.first();
             for(int i=0;i<count;i++,rs.next()){
