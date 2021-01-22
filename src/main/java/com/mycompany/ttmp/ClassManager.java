@@ -533,11 +533,11 @@ else if (value.equalsIgnoreCase("update / View subject & Faculty assignment"))
                             e.getX(), e.getY());
             }
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        if(roleOfUser.equals("admin"))
+        if(roleOfUser == role.ADMIN)
     Adminhomescreen.getAdminhomescreen();
-else if(roleOfUser.equals("faculty"))
+else if(roleOfUser == role.FACULTY)
     Facultyhomescreen.getFacultyhomescreen();
-else if(roleOfUser.equals("student"))
+else if(roleOfUser == role.STUDENT)
     Studenthomescreen.getStudenthomescreen();
 else
     System.exit(0);
@@ -550,7 +550,7 @@ else
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-     if(roleOfUser.equals("admin"))
+     if(roleOfUser == role.ADMIN)
          new ClassandRoomManager().setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
