@@ -26,6 +26,7 @@ public class Condition extends javax.swing.JFrame {
     TimeSlot[] periods;
     Day[] days;
     String selectedId;
+    ArrayList<ArrayList<Boolean>> editables = new ArrayList<>();
     Mode currentMode;
     ArrayList<String> selections = new ArrayList<>();
     Condition(ArrayList<FacSub> allFacSub, FastSelection fastSelection, TTCreation parentForm){
@@ -34,6 +35,7 @@ public class Condition extends javax.swing.JFrame {
         allFacSubs =  allFacSub;
         allFacSubsMap = new HashMap<>();
         allFacSubs.forEach(v -> {
+            System.out.println("cond constr:: "+v);
             allFacSubsMap.put(v.getSubId(), v);
         });
         this.initFastSelection = fastSelection;
@@ -57,7 +59,8 @@ public class Condition extends javax.swing.JFrame {
             listModel.addElement(
                     Utility.colorCodeValue(
                     v.getFacName() + " ("+v.getFacId()+") " + v.getSubName(),
-                            v.getColor()));
+                            v.getColor())
+            );
         });
         listModel.addElement("FREE");
         jList1.setModel(listModel);
@@ -357,10 +360,12 @@ public class Condition extends javax.swing.JFrame {
                 facSub = allFacSubsMap.get(id);
                 //System.out.println(facSub.getSubName()+" "+facSub.getLecturesCount());
             }
+            this.editables.clear();
             for (int i = 0; i < days.length; i++)
             {
                 Object[] val = new Object[periods.length + 1];
                 Boolean editvals[] = new Boolean[periods.length + 1];
+                ArrayList<Boolean> al_editvals = new ArrayList<>();
                     for (int j = 0; j < periods.length; j++)
                     {
                         //System.out.println("for "+i+", "+j);
@@ -380,7 +385,9 @@ public class Condition extends javax.swing.JFrame {
                         }
                         //System.out.println("e & f : "+isEditable);
                         editvals[j + 1] = isEditable;
+                        al_editvals.add(j, isEditable);
                     }
+                    this.editables.add(al_editvals);
                 editvals[0] = false;
                 val[0] = days[i].getDayName();
                 for (int j = 0; j <= periods.length; j++)
@@ -410,6 +417,13 @@ public class Condition extends javax.swing.JFrame {
             }
         };
         jTable1.setModel(tableModel);
+        for (var v: this.editables)
+        {
+            for( var j: v)
+                System.out.print(j+" ");
+            System.out.println("");
+        }
+        System.out.println("sadassasd\n\n\n");
     }
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
         int index = jList1.getSelectedIndex();
@@ -438,6 +452,7 @@ public class Condition extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         initFastSelection.replace(fastSelection);
+        
         parentForm.applyFastSelection();
         leavePage();
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -465,13 +480,14 @@ public class Condition extends javax.swing.JFrame {
         {
             int day = jTable1.getSelectedRow();
             int period = jTable1.getSelectedColumn();
-            if (period > 0)
+            System.out.println("current cell "+ period+" "+day);
+            if (period > 0 && editables.get(day).get(period - 1))
             {
-                FastSelection.SelectionValue selection ;
-            if((boolean)jTable1.getValueAt(day, period))
-                selection = FastSelection.SelectionValue.Select;
-            else selection = FastSelection.SelectionValue.None;
-            fastSelection.add(selectedId, day, period - 1, selection);
+                FastSelection.SelectionValue selection;
+                if((boolean)jTable1.getValueAt(day, period))
+                    selection = FastSelection.SelectionValue.Select;
+                else selection = FastSelection.SelectionValue.None;
+                fastSelection.add(selectedId, day, period - 1, selection);
             }
         }
     }//GEN-LAST:event_jTable1MouseReleased

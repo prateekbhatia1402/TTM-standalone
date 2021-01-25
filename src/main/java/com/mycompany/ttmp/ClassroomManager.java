@@ -5,6 +5,7 @@
  */
 package com.mycompany.ttmp;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -51,6 +52,23 @@ public class ClassroomManager {
             Logger.getLogger(ClassroomManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+
+    public static boolean isAssigned(String classId)
+    {
+        try(Connection con = SqlConnect.getDatabaseConnection();)
+        {
+            PreparedStatement st = con.prepareStatement("SELECT EXISTS("
+                    + "select `class id` from class_subject_faculty where `class id` = ?)");
+            st.setString(1, classId);
+            ResultSet rs = st.executeQuery();
+            rs.next();
+            return rs.getBoolean(1);
+        } catch (SQLException ex) {
+            Logger.getLogger(ClassroomManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
     
     public static void addToRecords(ClassSubjectFaculty[] records){
         Connection con=null;
@@ -60,22 +78,29 @@ public class ClassroomManager {
             con=SqlConnect.getDatabaseConnection();
             con.setAutoCommit(false);
             Statement st=con.createStatement();
+            String classId = records[0].getClassId();
+            st.executeUpdate("delete from schedule where `class id`='"+classId+"' "
+                    + "and status='incoming'");
+            int res = st.executeUpdate("update schedule set status = 'inactive', `to`=curdate()"
+                    + " where `class id`='"+classId+"' "
+                    + "and (status='outgoing' or status='active')");
             st.executeUpdate("delete from class_subject_faculty where `class id`='"
-                    +records[0].getClassId()+"'");
+                    + classId +"'");
             for(ClassSubjectFaculty record:records){
-                /*
-                    `CLASS ID` VARCHAR(10) NOT NULL,
-    `FACULTY ID` VARCHAR(10) NOT NULL,
-    `SUBJECT ID` VARCHAR(10) NOT NULL,
-    `ROOM ID` INTEGER NULL,
-
-                */
                 st.executeUpdate(String.format("insert into class_subject_faculty(`class id`,`faculty id`,"
                         + "`subject id`,`room id`) values('%s','%s','%s',%d)",record.getClassId(),
                         record.getFacultyId(),record.getSubjectId(),record.getRoomId()));
             }
             con.commit();
-            JOptionPane.showMessageDialog(null,"Records saved successfully");
+            JOptionPane.showMessageDialog(null, "Records saved successfully");
+            if (res > 0)
+            {
+                JOptionPane.showMessageDialog(null, "Time Table of this class is discontinued\n"
+                        + "Kindly create a new one", "Create Time Table", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                var timeTables = new TimeTables(classId);
+                new TTCreation(timeTables, timeTables.latest).setVisible(true);
+            }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null,"Something went wrong");
             try {
@@ -125,6 +150,4 @@ public class ClassroomManager {
         }
         return records;
     }
-    
-   
 }

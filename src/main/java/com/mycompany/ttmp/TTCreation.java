@@ -1,16 +1,19 @@
 package com.mycompany.ttmp;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import com.mycompany.ttmp.Utility;
-import java.util.Arrays;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -21,251 +24,258 @@ import java.util.Arrays;
  *
  * @author User
  */
-     class FacSub
-    {
-        private String facId;
-        private String facName;
-        private String subId;
-        private String subName;
-        int index = -1;
-        private HashSet<String> facSchedule;
-        private String color = "black";
+class FacSub {
 
-        int lectReq, lectAssigned = 0;
-        public String getSubName() {
-            return subName;
-        }
-        
-        public boolean isFree(String dayId, String timeslotId)
-        {
-            return !facSchedule.contains(dayId+"_"+timeslotId);
-        }
-        
-        public void setSubName(String subName) {
-            this.subName = subName;
-        }
+    private String facId;
+    private String facName;
+    private String subId;
+    private String subName;
+    int index = -1;
+    private HashSet<String> facSchedule;
+    private String color = "black";
 
-        public FacSub(String facId, String facName, String subId, String subName,
-                int lectReq) {
-            this.facId = facId;
-            this.facName = facName;
-            this.subId = subId;
-            this.subName = subName;
-            this.lectReq = lectReq;
-            this.facSchedule = new HashSet<>();
-        }
-        public FacSub(String facId, String facName, String subId, String subName,
-                int lectReq, String color) {
-            this.facId = facId;
-            this.facName = facName;
-            this.subId = subId;
-            this.subName = subName;
-            this.lectReq = lectReq;
-            this.facSchedule = new HashSet<>();
-            this.color = color;
-        }
-        public FacSub(String facId, String facName, String subId, String subName,
-                int lectReq, HashSet<String> facSchedule) {
-            this.facId = facId;
-            this.facName = facName;
-            this.subId = subId;
-            this.subName = subName;
-            this.lectReq = lectReq;
-            this.facSchedule = facSchedule;
-        }
-        public FacSub(String facId, String facName, String subId, String subName,
-                int lectReq,String color, HashSet<String> facSchedule) {
-            this.facId = facId;
-            this.facName = facName;
-            this.subId = subId;
-            this.subName = subName;
-            this.lectReq = lectReq;
-            this.facSchedule = facSchedule;
-            this.color = color;
-        }
-        public FacSub(int index, String facId, String facName, String subId,
-                String subName, int lectReq) {
-            this.index = index;
-            this.facId = facId;
-            this.facName = facName;
-            this.subId = subId;
-            this.subName = subName;
-            this.lectReq = lectReq;
-            this.facSchedule = new HashSet<>();
-        }
-        public FacSub(int index, String facId, String facName, String subId,
-                String subName, int lectReq, String color) {
-            this.index = index;
-            this.facId = facId;
-            this.facName = facName;
-            this.subId = subId;
-            this.subName = subName;
-            this.lectReq = lectReq;
-            this.color = color;
-            this.facSchedule = new HashSet<>();
-        }
-        public FacSub(int index, String facId, String facName, String subId,
-                String subName, int lectReq, HashSet<String> facSchedule) {
-            this.index = index;
-            this.facId = facId;
-            this.facName = facName;
-            this.subId = subId;
-            this.subName = subName;
-            this.lectReq = lectReq;
-            this.facSchedule = facSchedule;
-        }
-        public FacSub(int index, String facId, String facName, String subId,
-                String subName, int lectReq, HashSet<String> facSchedule, String color) {
-            this.index = index;
-            this.facId = facId;
-            this.facName = facName;
-            this.subId = subId;
-            this.subName = subName;
-            this.lectReq = lectReq;
-            this.color = color;
-            this.facSchedule = facSchedule;
-        }
-        
-        public FacSub(int index, FacSub facSub)
-        {
-            this.index = index;
-            facId = facSub.getFacId();
-            facName = facSub.getFacName();
-            subId = facSub.getSubId();
-            subName = facSub.getSubName();
-            lectReq = facSub.getLectReq();
-            lectAssigned = facSub.getLectAssigned();
-            this.facSchedule = facSub.facSchedule;
-            color = facSub.getColor();
-        }
-        public FacSub(FacSub facSub)
-        {
-            index = facSub.index;
-            facId = facSub.getFacId();
-            facName = facSub.getFacName();
-            subId = facSub.getSubId();
-            subName = facSub.getSubName();
-            lectReq = facSub.getLectReq();
-            lectAssigned = facSub.getLectAssigned();
-            facSchedule = facSub.facSchedule;
-            color =facSub.getColor();
-        }
+    int lectReq, lectAssigned = 0;
 
-        public int getLectReq() {
-            return lectReq;
-        }
+    public String getSubName() {
+        return subName;
+    }
 
-        public void setLectReq(int lectReq) {
-            this.lectReq = lectReq;
-        }
-        public String getColor() {
-            return color;
-        }
+    public boolean isFree(String dayId, String timeslotId) {
+        return !facSchedule.contains(dayId + "_" + timeslotId);
+    }
 
-        public void setColor(String color) {
-            this.color = color;
-        }
+    public void setSubName(String subName) {
+        this.subName = subName;
+    }
 
-        public int getLectAssigned() {
-            return lectAssigned;
-        }
+    public FacSub(String facId, String facName, String subId, String subName,
+            int lectReq) {
+        this.facId = facId;
+        this.facName = facName;
+        this.subId = subId;
+        this.subName = subName;
+        this.lectReq = lectReq;
+        this.facSchedule = new HashSet<>();
+    }
 
-        public void incLect() {
-            lectAssigned++;
-        }
-        public void decLect() {
-            lectAssigned--;
-        }
-        public void resetLect() {
-            lectAssigned = 0;
-        }
-        
+    public FacSub(String facId, String facName, String subId, String subName,
+            int lectReq, String color) {
+        this.facId = facId;
+        this.facName = facName;
+        this.subId = subId;
+        this.subName = subName;
+        this.lectReq = lectReq;
+        this.facSchedule = new HashSet<>();
+        this.color = color;
+    }
 
-        public String getFacId() {
-            return facId;
-        }
+    public FacSub(String facId, String facName, String subId, String subName,
+            int lectReq, HashSet<String> facSchedule) {
+        this.facId = facId;
+        this.facName = facName;
+        this.subId = subId;
+        this.subName = subName;
+        this.lectReq = lectReq;
+        this.facSchedule = facSchedule;
+    }
+
+    public FacSub(String facId, String facName, String subId, String subName,
+            int lectReq, String color, HashSet<String> facSchedule) {
+        this.facId = facId;
+        this.facName = facName;
+        this.subId = subId;
+        this.subName = subName;
+        this.lectReq = lectReq;
+        this.facSchedule = facSchedule;
+        this.color = color;
+    }
+
+    public FacSub(int index, String facId, String facName, String subId,
+            String subName, int lectReq) {
+        this.index = index;
+        this.facId = facId;
+        this.facName = facName;
+        this.subId = subId;
+        this.subName = subName;
+        this.lectReq = lectReq;
+        this.facSchedule = new HashSet<>();
+    }
+
+    public FacSub(int index, String facId, String facName, String subId,
+            String subName, int lectReq, String color) {
+        this.index = index;
+        this.facId = facId;
+        this.facName = facName;
+        this.subId = subId;
+        this.subName = subName;
+        this.lectReq = lectReq;
+        this.color = color;
+        this.facSchedule = new HashSet<>();
+    }
+
+    public FacSub(int index, String facId, String facName, String subId,
+            String subName, int lectReq, HashSet<String> facSchedule) {
+        this.index = index;
+        this.facId = facId;
+        this.facName = facName;
+        this.subId = subId;
+        this.subName = subName;
+        this.lectReq = lectReq;
+        this.facSchedule = facSchedule;
+    }
+
+    public FacSub(int index, String facId, String facName, String subId,
+            String subName, int lectReq, HashSet<String> facSchedule, String color) {
+        this.index = index;
+        this.facId = facId;
+        this.facName = facName;
+        this.subId = subId;
+        this.subName = subName;
+        this.lectReq = lectReq;
+        this.color = color;
+        this.facSchedule = facSchedule;
+    }
+
+    public FacSub(int index, FacSub facSub) {
+        this.index = index;
+        facId = facSub.getFacId();
+        facName = facSub.getFacName();
+        subId = facSub.getSubId();
+        subName = facSub.getSubName();
+        lectReq = facSub.getLectReq();
+        lectAssigned = facSub.getLectAssigned();
+        this.facSchedule = facSub.facSchedule;
+        color = facSub.getColor();
+    }
+
+    public FacSub(FacSub facSub) {
+        index = facSub.index;
+        facId = facSub.getFacId();
+        facName = facSub.getFacName();
+        subId = facSub.getSubId();
+        subName = facSub.getSubName();
+        lectReq = facSub.getLectReq();
+        lectAssigned = facSub.getLectAssigned();
+        facSchedule = facSub.facSchedule;
+        color = facSub.getColor();
+    }
+
+    public int getLectReq() {
+        return lectReq;
+    }
+
+    public void setLectReq(int lectReq) {
+        this.lectReq = lectReq;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public int getLectAssigned() {
+        return lectAssigned;
+    }
+
+    public void incLect() {
+        lectAssigned++;
+    }
+
+    public void decLect() {
+        lectAssigned--;
+    }
+
+    public void resetLect() {
+        lectAssigned = 0;
+    }
+
+    public String getFacId() {
+        return facId;
+    }
 
     @Override
     public String toString() {
-        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq=" + 
-                lectReq + ", lectAssigned=" + lectAssigned + '}';
+        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq="
+                + lectReq + ", lectAssigned=" + lectAssigned + '}';
     }
 
-        public void setFacId(String facId) {
-            this.facId = facId;
-        }
-
-        public String getFacName() {
-            return facName;
-        }
-
-        public void setFacName(String facName) {
-            this.facName = facName;
-        }
-
-        public String getSubId() {
-            return subId;
-        }
-
-        public void setSubId(String subId) {
-            this.subId = subId;
-        }
-        
-        public boolean meetsRequirements()
-        {
-            return lectAssigned >= lectReq;
-        }
+    public void setFacId(String facId) {
+        this.facId = facId;
     }
 
-class FastSelection
-{
+    public String getFacName() {
+        return facName;
+    }
+
+    public void setFacName(String facName) {
+        this.facName = facName;
+    }
+
+    public String getSubId() {
+        return subId;
+    }
+
+    public void setSubId(String subId) {
+        this.subId = subId;
+    }
+
+    public boolean meetsRequirements() {
+        return lectAssigned >= lectReq;
+    }
+}
+
+class FastSelection {
+
     int noOfDays, noOfPeriods;
     HashMap<String, HashMap<String, SelectionValue>> selections = new HashMap<>();
     CellValue[][] cellValues;
-    void add(String id, int day, int period, SelectionValue value)
-    {
+
+    void add(String id, int day, int period, SelectionValue value) {
         String oldId = cellValues[day][period].id;
         cellValues[day][period] = new CellValue(id, value);
-        if (oldId!= null && !oldId.isBlank())
-        {
-            if (id.equals(oldId))
-                selections.get(oldId).replace(day+"_"+period, value);
-            else
-                selections.get(oldId).remove(day+"_"+period);
+        if (oldId != null && !oldId.isBlank()) {
+            if (id.equals(oldId)) {
+                selections.get(oldId).replace(day + "_" + period, value);
+            } else {
+                selections.get(oldId).remove(day + "_" + period);
+            }
         }
-        if (id != null && !id.isBlank())
-        {
+        if (id != null && !id.isBlank()) {
             selections.putIfAbsent(id, new HashMap<>());
-            selections.get(id).put(day+"_"+period, value);
+            selections.get(id).put(day + "_" + period, value);
         }
     }
-    void remove(String id)
-    {
-        for (var indices : selections.get(id).keySet())
-        {
+
+    void remove(String id) {
+        for (var indices : selections.get(id).keySet()) {
             var day = Integer.valueOf(indices.substring(0, indices.indexOf("_")));
             var period = Integer.valueOf(indices.substring(indices.indexOf("_") + 1));
             cellValues[day][period] = new CellValue();
         }
         selections.get(id).clear();
-        
+
     }
-    enum SelectionValue
-    {
+
+    enum SelectionValue {
         None, Select, UnSelect
     }
-    FastSelection()
-    {
+
+    FastSelection() {
         noOfDays = DayControl.getAllDays().length;
         noOfPeriods = TimeSlotControl.getAllSlots().length;
         selections = new HashMap<>();
         cellValues = new CellValue[noOfDays][noOfPeriods];
-        for (int i = 0; i < noOfDays; i++)
-            for(int j = 0; j < noOfPeriods; j++)
+        for (int i = 0; i < noOfDays; i++) {
+            for (int j = 0; j < noOfPeriods; j++) {
                 cellValues[i][j] = new CellValue();
+            }
+        }
     }
-    void replace(FastSelection fastSelection)
-    {
+
+    void replace(FastSelection fastSelection) {
         noOfDays = fastSelection.noOfDays;
         noOfPeriods = fastSelection.noOfDays;
         selections = new HashMap<>();
@@ -277,11 +287,12 @@ class FastSelection
             selections.putIfAbsent(k, copy);
         });
         cellValues = new CellValue[noOfDays][noOfPeriods];
-        for(int i = 0; i < noOfDays; i++)
+        for (int i = 0; i < noOfDays; i++) {
             System.arraycopy(fastSelection.cellValues[i], 0, cellValues[i], 0, noOfPeriods);
+        }
     }
-    FastSelection(FastSelection fastSelection)
-    {
+
+    FastSelection(FastSelection fastSelection) {
         noOfDays = fastSelection.noOfDays;
         noOfPeriods = fastSelection.noOfDays;
         selections = new HashMap<>();
@@ -293,22 +304,27 @@ class FastSelection
             selections.putIfAbsent(k, copy);
         });
         cellValues = new CellValue[noOfDays][noOfPeriods];
-        for(int i = 0; i < noOfDays; i++)
-            for(int j = 0; j < noOfPeriods; j++)
+        for (int i = 0; i < noOfDays; i++) {
+            for (int j = 0; j < noOfPeriods; j++) {
                 cellValues[i][j] = fastSelection.cellValues[i][j];
+            }
+        }
     }
-    class CellValue
-    {
+
+    class CellValue {
+
         String id;
         SelectionValue value;
+
         CellValue(String id, SelectionValue value) {
-            if (id == null)
+            if (id == null) {
                 id = "";
+            }
             this.id = id;
             this.value = value;
-        }   
-        CellValue()
-        {
+        }
+
+        CellValue() {
             this.id = "";
             this.value = SelectionValue.None;
         }
@@ -316,41 +332,45 @@ class FastSelection
 }
 
 public class TTCreation extends javax.swing.JFrame {
+
     TimeSlot[] periods;
     Day[] days;
     DefaultTableModel timeTableModel;
     DefaultTableModel subjectTableModel;
     private I_Class[] classes;
     private I_Class selectedClass;
+    private LocalDate wef;
     private final role roleOfUser;
     private ArrayList<FacSub> availableFacSubDetailsList = new ArrayList<>();
-    private int selectedFacSubIndex=0;
-    private int[] selectedRowColumn=new int[2];
-    private String [][] timeTable;
+    private int selectedFacSubIndex = 0;
+    private int[] selectedRowColumn = new int[2];
+    private String[][] timeTable;
     private final HashMap<String, FacSub> allFacSubDetailsMap = new HashMap<>();
     private ArrayList<FacSub> allFacSubDetailsList = new ArrayList<>();
     private DefaultListModel<String> listModel;
     private TimeTables timeTables;
+
     /**
      * Creates new form TTCreation
      */
-    private void initTables()
-    {
+    private void initTables() {
         initTables(null);
     }
-    private void initTables(String tid){
-        if(timeTables.getTimeTablesList().isEmpty())
+
+    private void initTables(String tid) {
+        if (timeTables.getTimeTablesList().isEmpty()) {
             jLoadButton.setVisible(false);
-        else
+        } else {
             jLoadButton.setVisible(true);
-        periods=TimeSlotControl.getAllSlots();
-        days=DayControl.getAllDays();
-        timeTableModel=(DefaultTableModel)jTimeTable.getModel();
+        }
+        periods = TimeSlotControl.getAllSlots();
+        days = DayControl.getAllDays();
+        timeTableModel = (DefaultTableModel) jTimeTable.getModel();
         timeTableModel.setRowCount(0);
         timeTableModel.setColumnCount(0);
-        subjectTableModel=(DefaultTableModel)jSubjectAllotedTable.getModel();
+        subjectTableModel = (DefaultTableModel) jSubjectAllotedTable.getModel();
         timeTableModel.addColumn("DAY \\ TIME");
-        listModel=new DefaultListModel<>();
+        listModel = new DefaultListModel<>();
         jList1.setModel(listModel);
         for (TimeSlot period : periods) {
             timeTableModel.addColumn(period.toSimpleString());
@@ -359,138 +379,143 @@ public class TTCreation extends javax.swing.JFrame {
             System.out.println(day.getDayId() + " " + day.getDayName());
             timeTableModel.addRow(new Object[]{day.getDayName()});
         }
-        timeTable=new String[days.length][periods.length];
+        timeTable = new String[days.length][periods.length];
         allFacSubDetailsList.clear();
         allFacSubDetailsMap.clear();
-        //subjects=TimeTableControl.getSubjects(selectedClass.getId());
-//        System.out.println(subjects.length);
         var v = TimeTableControl.getFacultySubjectDetails(selectedClass.getId(),
-                LocalDate.now().atStartOfDay().plusDays(1).toLocalDate(), null);
-        for (int i = 0; i < v.size(); i++)
-        {
+                wef, null);
+        
+        if (v == null || v.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Subjects and teachers have not been assigned for this class,\n"
+                    + " please do that using classroom manager before proceeding");
+            jChangeClassButtonActionPerformed(null);
+            return;
+        }
+        for (int i = 0; i < v.size(); i++) {
             var f = new FacSub(i, v.get(i));
             f.setColor(Utility.colors[i]);
             allFacSubDetailsMap.put(f.getSubId(), f);
             allFacSubDetailsMap.put(f.getFacId(), f);
             allFacSubDetailsList.add(f);
         }
-        if(allFacSubDetailsMap==null || allFacSubDetailsMap.isEmpty()){
-            JOptionPane.showMessageDialog(this,"Subjects and teachers have not been assigned for this class,\n"
-                    + " please do that using classroom manager before proceeding");
-            leavePage();
-            return;
-        }
-            
+
         System.out.println(subjectTableModel.getRowCount());
         subjectTableModel.setRowCount(0);
         allFacSubDetailsList.forEach(facSub -> {
+            System.out.println(facSub.toString());
             subjectTableModel.addRow(
                     new Object[]{Utility.colorCodeValue(facSub.getSubName(),
-                            facSub.getColor()),facSub.getLectReq(),0});
+                                facSub.getColor()), facSub.getLectReq(), 0});
         });
         System.out.println(subjectTableModel.getRowCount());
-        if (tid == null)
+        if (tid == null) {
             initTableData(timeTables.fetchLatestTimeTable());
-        else
+        } else {
             initTableData(timeTables.fetchParticularTimeTable(tid));
+        }
         jTimeTable.setEnabled(true);
-}
-    
-    private void clearTable()
-    {
+    }
+
+    private void clearTable() {
         timeTable = new String[days.length][periods.length];
         timeTableModel.setRowCount(0);
         for (Day day : days) {
             System.out.println(day.getDayId() + " " + day.getDayName());
             timeTableModel.addRow(new Object[]{day.getDayName()});
         }
-            
+
         subjectTableModel.setRowCount(0);
         allFacSubDetailsList.forEach(facSub -> {
             facSub.resetLect();
             subjectTableModel.addRow(
                     new Object[]{Utility.colorCodeValue(facSub.getSubName(),
-                            facSub.getColor()),facSub.getLectReq(),0});
+                                facSub.getColor()), facSub.getLectReq(), 0});
         });
     }
-    
-    private void initTableData(ArrayList<Schedule> schedule){
-        if(schedule==null || schedule.isEmpty())
+
+    private void initTableData(ArrayList<Schedule> schedule) {
+        if (schedule == null || schedule.isEmpty()) {
             return;
+        }
         clearTable();
-        for(Schedule record : schedule){
-            int period=-1,day=-1;
-            
-            for(int i=0;i<periods.length;i++)
-                if(periods[i].getId().equalsIgnoreCase(record.getTimeslotId())){
-                    period=i;
+        for (Schedule record : schedule) {
+            int period = -1, day = -1;
+
+            for (int i = 0; i < periods.length; i++) {
+                if (periods[i].getId().equalsIgnoreCase(record.getTimeslotId())) {
+                    period = i;
                     break;
                 }
-            for(int i=0;i<days.length;i++)
-                if(days[i].getDayId().equalsIgnoreCase(record.getDayId())){
-                    day=i;
+            }
+            for (int i = 0; i < days.length; i++) {
+                if (days[i].getDayId().equalsIgnoreCase(record.getDayId())) {
+                    day = i;
                     break;
                 }
-            if(period<0 || day <0)
-                  continue;
-            String subjectName=null,subjectId=record.getSubjectId(),facultyId
-                    =record.getFacultyId();
-            String fac_sub=facultyId+"_"+subjectId;
+            }
+            if (period < 0 || day < 0) {
+                continue;
+            }
+            String subjectName = null, subjectId = record.getSubjectId();
             String facName = "";
             var facSub = allFacSubDetailsMap.get(subjectId);
+            if(!facSub.isFree(record.getDayId(), record.getTimeslotId()))
+                continue;
+            String fac_sub = facSub.getFacId() + "_" + subjectId;
             facName = facSub.getFacName();
             subjectName = facSub.getSubName();
-            timeTable[day][period]=fac_sub;
+            timeTable[day][period] = fac_sub;
             increaseSubCount(subjectId);
-        timeTableModel.setValueAt(
-                Utility.colorCodeValue(facName + " " + subjectName,
-                        facSub.getColor()), day, period+1);
+            timeTableModel.setValueAt(
+                    Utility.colorCodeValue(facName + " " + subjectName,
+                            facSub.getColor()), day, period + 1);
         }
     }
+
     public TTCreation() {
         initComponents();
         jLoadButton.setVisible(false);
-        roleOfUser=LoginF.getUserRole();
+        roleOfUser = LoginF.getUserRole();
         jFacultySelectButton.setEnabled(false);
         jSubmitButton.setEnabled(false);
-        jFastSelectButton.setEnabled
-        
-        
-        
-        
-        
-        
-        
-        (false);
-        classes=TimeTableControl.getClasses();
+        jFastSelectButton.setEnabled(false);
+        classes = TimeTableControl.getClasses();
         jClassBox.removeAllItems();
+        jChangeClassButton.setEnabled(false);
+        jWefTextField.setText(
+                LocalDate.now().plusDays(1).format(
+                        DateTimeFormatter.ofPattern("d-MM-yyyy")));
         jClassBox.addItem("select class");
         for (I_Class classe : classes) {
-            jClassBox.addItem(classe.getName()+(classe.getAssignmentStatus()? "[ UPDATE ]":"[ CREATE ]"));
+            jClassBox.addItem(classe.getName() + 
+                    (classe.getAssignmentStatus() ? "[ UPDATE ]" : "[ CREATE ]"));
         }
         jClassSelectButton.setEnabled(false);
         jClearSelectionButton.setEnabled(false);
         jTimeTable.setEnabled(false);
     }
-    
+
     TTCreation(TimeTables timeTables, String tid) {
         initComponents();
-        roleOfUser=LoginF.getUserRole();
+        roleOfUser = LoginF.getUserRole();
         jFacultySelectButton.setEnabled(false);
         jSubmitButton.setEnabled(false);
         jFastSelectButton.setEnabled(false);
-        classes=TimeTableControl.getClasses();
+        classes = TimeTableControl.getClasses();
+        jChangeClassButton.setEnabled(false);
+        jWefTextField.setText(LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("d-MM-yyyy")));
         jClassBox.removeAllItems();
         this.timeTables = timeTables;
-        selectedClass = ClassControl.getClass(timeTables.classId);
+        selectedClass = ClassControl.getClass(timeTables.tablesOf);
         jClassBox.addItem("select class");
         String svalue = "";
         for (I_Class classe : classes) {
-            String value = classe.getName()+
-                    (classe.getAssignmentStatus()? "[ UPDATE ]":"[ CREATE ]");
+            String value = classe.getName()
+                    + (classe.getAssignmentStatus() ? "[ UPDATE ]" : "[ CREATE ]");
             jClassBox.addItem(value);
-            if (timeTables.classId.equals(classe.getId()))
+            if (timeTables.tablesOf.equals(classe.getId())) {
                 svalue = value;
+            }
         }
         jClassSelectButton.setVisible(false);
         jClassBox.setSelectedItem(svalue);
@@ -499,248 +524,235 @@ public class TTCreation extends javax.swing.JFrame {
         jTimeTable.setEnabled(false);
         initTables(tid);
     }
-    
-    private boolean requirementsMet(ArrayList<FacSub> facSubList)
-    {
-      return  facSubList.stream().allMatch(v -> (v.meetsRequirements()));
+
+    private boolean requirementsMet(ArrayList<FacSub> facSubList) {
+        return facSubList.stream().allMatch(v -> (v.meetsRequirements()));
     }
+
     private ArrayList<FacSub> getAvailableFaculties(ArrayList<FacSub> facSubList,
-            String dayId, String timeslotId)
-    {
+            String dayId, String timeslotId) {
         return getAvailableFaculties(facSubList, dayId, timeslotId, false);
     }
+
     private ArrayList<FacSub> getAvailableFaculties(ArrayList<FacSub> facSubList,
-            String dayId, String timeslotId,boolean log)
-    {
-        if(log)
+            String dayId, String timeslotId, boolean log) {
+        if (log) {
             System.out.println("-----------GetAvailableFaculty----------");
+        }
         ArrayList<FacSub> availableFaculties = new ArrayList<>();
-        for (var facSub : facSubList)
-        {
-            if(log)
-                System.out.println(facSub.getFacId()+"(free, reqMet) : "+
-                        facSub.isFree(dayId, timeslotId)+" , "
-                + facSub.meetsRequirements());
-            if (facSub.isFree(dayId, timeslotId) && !facSub.meetsRequirements())
-            {
-                if (log)
-                    System.out.println(facSub.getFacId()+" Available");
-                availableFaculties.add(facSub);
+        for (var facSub : facSubList) {
+            if (log) {
+                System.out.println(facSub.getFacId() + "(free, reqMet) : "
+                        + facSub.isFree(dayId, timeslotId) + " , "
+                        + facSub.meetsRequirements());
             }
-            else{
-                if (log)
-                    System.out.println(facSub.getFacId()+"Not Available");
+            if (facSub.isFree(dayId, timeslotId) && !facSub.meetsRequirements()) {
+                if (log) {
+                    System.out.println(facSub.getFacId() + " Available");
+                }
+                availableFaculties.add(facSub);
+            } else {
+                if (log) {
+                    System.out.println(facSub.getFacId() + "Not Available");
+                }
             }
         }
-        if(log)
+        if (log) {
             System.out.println("----------------------------------");
+        }
         return availableFaculties;
     }
-    
+
     private boolean canBeAssigned(ArrayList<FacSub> facSubList,
-            String dayId, String timeslotId)
-    {
-        for (var facSub : facSubList)
-        {
-            if (facSub.isFree(dayId, timeslotId) )
-            {
-             return true;   
+            String dayId, String timeslotId) {
+        for (var facSub : facSubList) {
+            if (facSub.isFree(dayId, timeslotId)) {
+                return true;
             }
         }
         return false;
     }
-    public void sugestSchedule(){
+
+    public void sugestSchedule() {
         ArrayList<FacSub> facSubToAssign = new ArrayList<>();
         allFacSubDetailsList.forEach(facSub -> {
             facSubToAssign.add(new FacSub(facSub));
         });
-            ArrayList<int[]> allDays = new ArrayList<>();
-            for (int i = 0;i < days.length; i++)
-            {
-                int k = 0;
-                while(true)
-                {
-                    if (k == periods.length || 
-                        (timeTable[i][k]== null || timeTable[i][k].isBlank()
-                            ))
-                        break;
-                    k++;
-                }
-                allDays.add(new int[]{i, k});
-            }
-        while(!requirementsMet(facSubToAssign))
-        {
-            Random random = new Random();
-                if (allDays.size() < 1)
+        ArrayList<int[]> allDays = new ArrayList<>();
+        for (int i = 0; i < days.length; i++) {
+            int k = 0;
+            while (true) {
+                if (k == periods.length
+                        || (timeTable[i][k] == null || timeTable[i][k].isBlank())) {
                     break;
-                ArrayList<int[]> daysToChoose = new ArrayList<>();
-                int maxv = allDays.get(0)[1], minv = allDays.get(0)[1];
-                for (int i = 1; i < allDays.size(); i++)
-                {
-                    //System.out.println("day : "+allDays.get(i)[0]+" "+allDays.get(i)[1]);
-                    if (allDays.get(i)[1] > maxv)
-                        maxv = allDays.get(i)[1];
-                    if(allDays.get(i)[1] < minv)
-                        minv = allDays.get(i)[1];
                 }
-                if ((maxv - minv) >= 1)
-                {
-                    for (int[] d : allDays)
-                    {
-                        if (d[1] != maxv)
-                            daysToChoose.add(d);
+                k++;
+            }
+            allDays.add(new int[]{i, k});
+        }
+        while (!requirementsMet(facSubToAssign)) {
+            Random random = new Random();
+            if (allDays.size() < 1) {
+                break;
+            }
+            ArrayList<int[]> daysToChoose = new ArrayList<>();
+            int maxv = allDays.get(0)[1], minv = allDays.get(0)[1];
+            for (int i = 1; i < allDays.size(); i++) {
+                //System.out.println("day : "+allDays.get(i)[0]+" "+allDays.get(i)[1]);
+                if (allDays.get(i)[1] > maxv) {
+                    maxv = allDays.get(i)[1];
+                }
+                if (allDays.get(i)[1] < minv) {
+                    minv = allDays.get(i)[1];
+                }
+            }
+            if ((maxv - minv) >= 1) {
+                for (int[] d : allDays) {
+                    if (d[1] != maxv) {
+                        daysToChoose.add(d);
                     }
                 }
-                else
-                    daysToChoose = new ArrayList(allDays);
-                for (var d : daysToChoose)
-                {
-                    //System.out.println("days : "+d[0]+" " + d[1]);
-                }
-                int dayI = random.nextInt(daysToChoose.size());
-                int day = daysToChoose.get(dayI)[0];
-                //System.out.println("day choosen "+dayI+" "+day);
-                int tp = -1;
-                boolean assigned = false;
-                int initday = day;
-                do
-                {
-                    tp++;
-                    if (tp == periods.length)
-                    {
-                        tp = 0;
-                        day = ++day % days.length;
-                        if (initday == day)
-                            break;
+            } else {
+                daysToChoose = new ArrayList(allDays);
+            }
+            for (var d : daysToChoose) {
+                //System.out.println("days : "+d[0]+" " + d[1]);
+            }
+            int dayI = random.nextInt(daysToChoose.size());
+            int day = daysToChoose.get(dayI)[0];
+            //System.out.println("day choosen "+dayI+" "+day);
+            int tp = -1;
+            boolean assigned = false;
+            int initday = day;
+            do {
+                tp++;
+                if (tp == periods.length) {
+                    tp = 0;
+                    day = ++day % days.length;
+                    if (initday == day) {
+                        break;
                     }
-                    if (timeTable[day][tp] != null && !timeTable[day][tp].isBlank())
-                        continue;
-                    ArrayList<FacSub> facultyToChoose = getAvailableFaculties(facSubToAssign,
-                            days[day].getDayId(),  periods[tp].getId());
-                    if (facultyToChoose.size() < 1)
-                    {
-                        if (requirementsMet(facSubToAssign))
-                            break;
-                        continue;
-                    }
-                    int subI = random.nextInt(facultyToChoose.size());
-                    FacSub facSub = facultyToChoose.get(subI);
-                        String fac_sub=facSub.getFacId()+"_"+facSub.getSubId();
-                        timeTable[day][tp]=fac_sub;
-                        increaseSubCount(facSub.getSubId());
-                        facSub.incLect();
-                        timeTableModel.setValueAt(
-                           facSub.getFacName()+
-                        " "+facSub.getSubName(), day, tp+1);
-                        assigned = true;
-                        allDays.get(allDays.indexOf(daysToChoose.get(dayI)))[1]++;
                 }
-                while(!assigned);
-                //System.out.println(allDays);
-                ArrayList<int[]> indexToRemove = new ArrayList<>();
-                allDays.stream().filter(d -> (d[1] >= periods.length)).forEachOrdered(d -> {
-                    indexToRemove.add(d);
-                });
-                indexToRemove.forEach(i -> {
-                    allDays.remove(i);
-                });
-                
+                if (timeTable[day][tp] != null && !timeTable[day][tp].isBlank()) {
+                    continue;
+                }
+                ArrayList<FacSub> facultyToChoose = getAvailableFaculties(facSubToAssign,
+                        days[day].getDayId(), periods[tp].getId());
+                if (facultyToChoose.size() < 1) {
+                    if (requirementsMet(facSubToAssign)) {
+                        break;
+                    }
+                    continue;
+                }
+                int subI = random.nextInt(facultyToChoose.size());
+                FacSub facSub = facultyToChoose.get(subI);
+                String fac_sub = facSub.getFacId() + "_" + facSub.getSubId();
+                timeTable[day][tp] = fac_sub;
+                increaseSubCount(facSub.getSubId());
+                facSub.incLect();
+                timeTableModel.setValueAt(
+                        facSub.getFacName()
+                        + " " + facSub.getSubName(), day, tp + 1);
+                assigned = true;
+                allDays.get(allDays.indexOf(daysToChoose.get(dayI)))[1]++;
+            } while (!assigned);
+            //System.out.println(allDays);
+            ArrayList<int[]> indexToRemove = new ArrayList<>();
+            allDays.stream().filter(d -> (d[1] >= periods.length)).forEachOrdered(d -> {
+                indexToRemove.add(d);
+            });
+            indexToRemove.forEach(i -> {
+                allDays.remove(i);
+            });
+
         }
     }
-    public void sugestSchedulev2(){
+
+    public void sugestSchedulev2() {
         ArrayList<FacSub> facSubToAssign = new ArrayList<>();
         allFacSubDetailsList.forEach(facSub -> {
             facSubToAssign.add(new FacSub(facSub));
         });
         ArrayList<int[]> periodsList = new ArrayList<>();
-        for (int i = 0;i < periods.length; i++)
-        {
+        for (int i = 0; i < periods.length; i++) {
             ArrayList<Integer> data = new ArrayList<>();
-            for (int j = 0;j < days.length; j++)
-            {
-                if (timeTable[j][i] == null || timeTable[j][i].isBlank())
+            for (int j = 0; j < days.length; j++) {
+                if (timeTable[j][i] == null || timeTable[j][i].isBlank()) {
                     data.add(j);
+                }
             }
             Collections.shuffle(data);
-            for (var d : data)
-            {
+            for (var d : data) {
                 periodsList.add(new int[]{d, i});
             }
         }
         Random random = new Random();
-        for (var periodData : periodsList)
-        {
+        for (var periodData : periodsList) {
             int day = periodData[0], period = periodData[1];
-            System.out.println("Assigning for : "+day+" "+period);
+            System.out.println("Assigning for : " + day + " " + period);
             ArrayList<FacSub> facultyToChoose = getAvailableFaculties(facSubToAssign,
-            days[day].getDayId(),  periods[period].getId());
-                    if (facultyToChoose.size() < 1)
-                    {
-                        getAvailableFaculties(facSubToAssign,
-                            days[day].getDayId(),  periods[period].getId(), true);
-                        System.out.println("Assignment : Skipped\n");
-                        if (requirementsMet(facSubToAssign))
-                            break;
-                        continue;
-                    }
-                    int subI = random.nextInt(facultyToChoose.size());
-                    FacSub facSub = facultyToChoose.get(subI);
-                        String fac_sub=facSub.getFacId()+"_"+facSub.getSubId();
-                        timeTable[day][period]=fac_sub;
-                        increaseSubCount(facSub.getSubId());
-                        facSub.incLect();
-                        timeTableModel.setValueAt(
-                           facSub.getFacName()+
-                        " "+facSub.getSubName(), day, period+1);
-                        System.out.println("Assignment : "+fac_sub+"\n");
-            if(requirementsMet(facSubToAssign))
+                    days[day].getDayId(), periods[period].getId());
+            if (facultyToChoose.size() < 1) {
+                getAvailableFaculties(facSubToAssign,
+                        days[day].getDayId(), periods[period].getId(), true);
+                System.out.println("Assignment : Skipped\n");
+                if (requirementsMet(facSubToAssign)) {
+                    break;
+                }
+                continue;
+            }
+            int subI = random.nextInt(facultyToChoose.size());
+            FacSub facSub = facultyToChoose.get(subI);
+            String fac_sub = facSub.getFacId() + "_" + facSub.getSubId();
+            timeTable[day][period] = fac_sub;
+            increaseSubCount(facSub.getSubId());
+            facSub.incLect();
+            timeTableModel.setValueAt(
+                    facSub.getFacName()
+                    + " " + facSub.getSubName(), day, period + 1);
+            System.out.println("Assignment : " + fac_sub + "\n");
+            if (requirementsMet(facSubToAssign)) {
                 break;
+            }
         }
     }
+
     String[][] backtrackSchedule(int index, String[][] tt,
-            ArrayList<int[]> periodsList, ArrayList<FacSub> facSubToAssign)
-    {
-        System.out.println("in bcktrck : "+index);
-        if (requirementsMet(facSubToAssign))
-        {
+            ArrayList<int[]> periodsList, ArrayList<FacSub> facSubToAssign) {
+        System.out.println("in bcktrck : " + index);
+        if (requirementsMet(facSubToAssign)) {
             System.out.println("Task Complete");
             return tt;
         }
-        if (index >= periodsList.size())
-        {
+        if (index >= periodsList.size()) {
             System.out.println("Task Failed");
             return null;
         }
         int day = periodsList.get(index)[0], period = periodsList.get(index)[1];
-        System.out.println("for "+day+","+period);
+        System.out.println("for " + day + "," + period);
         ArrayList<FacSub> facultyToChoose = getAvailableFaculties(facSubToAssign,
-            days[day].getDayId(),  periods[period].getId());
-                    if (facultyToChoose.size() < 1)
-                    {
-                        System.out.println("No Faculty Available");
-                        if(canBeAssigned(facSubToAssign, days[day].getDayId(), 
-                                periods[period].getId()))
-                        {
-                            System.out.println("Can be Assigned , bakctracking");
-                            return null;
-                        }
-                        else {
-                            System.out.println("Cannot be assigned, moving on");
-                            return backtrackSchedule(index + 1, tt, 
-                    periodsList, facSubToAssign);
-                        }
-                    }
+                days[day].getDayId(), periods[period].getId());
+        if (facultyToChoose.size() < 1) {
+            System.out.println("No Faculty Available");
+            if (canBeAssigned(facSubToAssign, days[day].getDayId(),
+                    periods[period].getId())) {
+                System.out.println("Can be Assigned , bakctracking");
+                return null;
+            } else {
+                System.out.println("Cannot be assigned, moving on");
+                return backtrackSchedule(index + 1, tt,
+                        periodsList, facSubToAssign);
+            }
+        }
         Collections.shuffle(facultyToChoose);
-        for (var fac: facultyToChoose)
-        {
+        for (var fac : facultyToChoose) {
             System.out.println("trying " + fac.getFacId());
-            tt[day][period] = fac.getFacId()+"_"+fac.getSubId();
+            tt[day][period] = fac.getFacId() + "_" + fac.getSubId();
             fac.incLect();
-            String[][] result = backtrackSchedule(index + 1, tt, 
+            String[][] result = backtrackSchedule(index + 1, tt,
                     periodsList, facSubToAssign);
-            if (result != null)
-            {
-                System.out.println("Found sol with "+day+","+period+" "+fac.getFacId());
+            if (result != null) {
+                System.out.println("Found sol with " + day + "," + period + " " + fac.getFacId());
                 return result;
             }
             tt[day][period] = null;
@@ -748,7 +760,8 @@ public class TTCreation extends javax.swing.JFrame {
         }
         return null;
     }
-    public void sugestSchedulev3(){
+
+    public void sugestSchedulev3() {
         System.out.println("-------------[ suggestv3 ]-----------------------");
         ArrayList<FacSub> facSubToAssign = new ArrayList<>();
         System.out.println("allfacsub");
@@ -757,91 +770,91 @@ public class TTCreation extends javax.swing.JFrame {
             facSubToAssign.add(new FacSub(facSub));
         });
         System.out.println("facSubToAssign");
-        facSubToAssign.forEach(facSub -> {System.out.println(facSub.getSubName()
-                + " " + facSub.getLectAssigned());
-                });
+        facSubToAssign.forEach(facSub -> {
+            System.out.println(facSub.getSubName()
+                    + " " + facSub.getLectAssigned());
+        });
         ArrayList<int[]> periodsList = new ArrayList<>();
-        for (int i = 0;i < periods.length; i++)
-        {
+        for (int i = 0; i < periods.length; i++) {
             ArrayList<Integer> data = new ArrayList<>();
-            for (int j = 0;j < days.length; j++)
-            {
-                if (timeTable[j][i] == null || timeTable[j][i].isBlank())
+            for (int j = 0; j < days.length; j++) {
+                if (timeTable[j][i] == null || timeTable[j][i].isBlank()) {
                     data.add(j);
+                }
             }
             Collections.shuffle(data);
-            for (var d : data)
-            {
+            for (var d : data) {
                 periodsList.add(new int[]{d, i});
             }
         }
-        
-        String [][] tt = new String[days.length][periods.length];
-        for (int d = 0; d < days.length; d++)
+
+        String[][] tt = new String[days.length][periods.length];
+        for (int d = 0; d < days.length; d++) {
             System.arraycopy(timeTable[d], 0, tt[d], 0, periods.length);
+        }
         tt = backtrackSchedule(0, tt, periodsList, facSubToAssign);
-        if (tt == null)
-            JOptionPane.showMessageDialog(this,"Not Possible With Current Constraints");
-        else
-        {
+        if (tt == null) {
+            JOptionPane.showMessageDialog(this, "Not Possible With Current Constraints");
+        } else {
             allFacSubDetailsList.forEach(facSub -> facSub.resetLect());
-            for (int d = 0; d < days.length; d++)
-                for (int p = 0; p < periods.length; p++)
-                {
+            for (int d = 0; d < days.length; d++) {
+                for (int p = 0; p < periods.length; p++) {
                     String val = tt[d][p];
                     timeTable[d][p] = val;
-                    if (val != null && !val.isBlank() && !val.equalsIgnoreCase("free"))
-                    {
+                    if (val != null && !val.isBlank() && !val.equalsIgnoreCase("free")) {
                         updateCell(d, p, val.substring(val.indexOf("_") + 1));
                     }
                 }
+            }
         }
     }
-    private void updateCell(int day, int period, String subId)
-    {
-        if (subId.equalsIgnoreCase("free"))
-        {
+
+    private void updateCell(int day, int period, String subId) {
+        if (subId.equalsIgnoreCase("free")) {
             timeTable[day][period] = "free";
-            timeTableModel.setValueAt("FREE", day, period + 1);          
+            timeTableModel.setValueAt("FREE", day, period + 1);
             return;
         }
         var facSub = allFacSubDetailsMap.get(subId);
         updateCell(day, period, facSub);
     }
-    private void updateCell(int day, int period, FacSub facSub)
-    {
-        timeTable[day][period] = facSub.getFacId()+"_"+facSub.getSubId();
+
+    private void updateCell(int day, int period, FacSub facSub) {
+        timeTable[day][period] = facSub.getFacId() + "_" + facSub.getSubId();
+        System.out.println("updating cell "+day+" "+period+" "
+                + facSub.getFacId() + "_" + facSub.getSubId());
         increaseSubCount(facSub.getSubId());
-        String val = facSub.getFacName()+" "+facSub.getSubName();
+        String val = facSub.getFacName() + " " + facSub.getSubName();
         timeTableModel.setValueAt(Utility.colorCodeValue(val, facSub.getColor()),
                 day, period + 1);
     }
-    private void updateList(){
-        if(allFacSubDetailsList == null || allFacSubDetailsList.isEmpty())
+
+    private void updateList() {
+        if (allFacSubDetailsList == null || allFacSubDetailsList.isEmpty()) {
             return;
+        }
         availableFacSubDetailsList.clear();
-        for(var v : allFacSubDetailsList)
-        {
-            listModel.addElement(Utility.colorCodeValue(v.getFacName()+"("+v.getFacId()+") : "+
-                    v.getSubName(), v.getColor()));
+        for (var v : allFacSubDetailsList) {
+            listModel.addElement(Utility.colorCodeValue(v.getFacName() + "(" + v.getFacId() + ") : "
+                    + v.getSubName(), v.getColor()));
             availableFacSubDetailsList.add(v);
         }
         listModel.addElement("FREE");
     }
-    private void updateList(String dayId, String timeSlotId){
-        
+
+    private void updateList(String dayId, String timeSlotId) {
+
         availableFacSubDetailsList.clear();
-        for(var v : allFacSubDetailsList)
-        {
-            if (v.isFree(dayId, timeSlotId))
-            {
-                listModel.addElement(Utility.colorCodeValue(v.getFacName()+"("+v.getFacId()+") : "+
-                    v.getSubName(), v.getColor()));
+        for (var v : allFacSubDetailsList) {
+            if (v.isFree(dayId, timeSlotId)) {
+                listModel.addElement(Utility.colorCodeValue(v.getFacName() + "(" + v.getFacId() + ") : "
+                        + v.getSubName(), v.getColor()));
                 availableFacSubDetailsList.add(v);
             }
         }
         listModel.addElement("FREE");
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -867,7 +880,7 @@ public class TTCreation extends javax.swing.JFrame {
         jSubmitButton = new javax.swing.JButton();
         jFacultySelectButton = new javax.swing.JButton();
         jClearSelectionButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jAutomateButton = new javax.swing.JButton();
         jClearAllButton = new javax.swing.JButton();
         jLoadButton = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
@@ -875,6 +888,8 @@ public class TTCreation extends javax.swing.JFrame {
         jClassSelectButton = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jClassBox = new javax.swing.JComboBox<>();
+        jWefTextField = new javax.swing.JTextField();
+        jChangeClassButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 255, 204));
@@ -910,6 +925,7 @@ public class TTCreation extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jList1);
 
         jFastSelectButton.setText("Select Multiple");
+        jFastSelectButton.setEnabled(false);
         jFastSelectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFastSelectButtonActionPerformed(evt);
@@ -1003,6 +1019,7 @@ public class TTCreation extends javax.swing.JFrame {
 
         jSubmitButton.setFont(new java.awt.Font("Cambria", 0, 18)); // NOI18N
         jSubmitButton.setText("Submit");
+        jSubmitButton.setEnabled(false);
         jSubmitButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jSubmitButtonActionPerformed(evt);
@@ -1010,6 +1027,7 @@ public class TTCreation extends javax.swing.JFrame {
         });
 
         jFacultySelectButton.setText("Select Faculty");
+        jFacultySelectButton.setEnabled(false);
         jFacultySelectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFacultySelectButtonActionPerformed(evt);
@@ -1017,20 +1035,23 @@ public class TTCreation extends javax.swing.JFrame {
         });
 
         jClearSelectionButton.setText("CLEAR SELECTION");
+        jClearSelectionButton.setEnabled(false);
         jClearSelectionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jClearSelectionButtonActionPerformed(evt);
             }
         });
 
-        jButton1.setText("automate");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jAutomateButton.setText("automate");
+        jAutomateButton.setEnabled(false);
+        jAutomateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jAutomateButtonActionPerformed(evt);
             }
         });
 
         jClearAllButton.setText("CLEAR ALL");
+        jClearAllButton.setEnabled(false);
         jClearAllButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jClearAllButtonActionPerformed(evt);
@@ -1038,6 +1059,7 @@ public class TTCreation extends javax.swing.JFrame {
         });
 
         jLoadButton.setText("Load Data");
+        jLoadButton.setEnabled(false);
         jLoadButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jLoadButtonActionPerformed(evt);
@@ -1058,10 +1080,10 @@ public class TTCreation extends javax.swing.JFrame {
                 .addGap(113, 113, 113)
                 .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(42, 42, 42)
-                .addComponent(jButton1)
+                .addComponent(jAutomateButton)
                 .addGap(18, 18, 18)
                 .addComponent(jLoadButton)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(224, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1071,7 +1093,7 @@ public class TTCreation extends javax.swing.JFrame {
                     .addComponent(jClearSelectionButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jFacultySelectButton)
                     .addComponent(jSubmitButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1)
+                    .addComponent(jAutomateButton)
                     .addComponent(jClearAllButton)
                     .addComponent(jLoadButton))
                 .addGap(25, 25, 25))
@@ -1136,16 +1158,39 @@ public class TTCreation extends javax.swing.JFrame {
             }
         });
 
+        jWefTextField.setToolTipText("wef");
+        jWefTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jWefTextFieldActionPerformed(evt);
+            }
+        });
+        jWefTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jWefTextFieldKeyTyped(evt);
+            }
+        });
+
+        jChangeClassButton.setText("Change");
+        jChangeClassButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jChangeClassButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(78, 78, 78)
+                .addGap(38, 38, 38)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jClassSelectButton)
                     .addComponent(jClassBox, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jWefTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jChangeClassButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 970, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1158,7 +1203,10 @@ public class TTCreation extends javax.swing.JFrame {
                         .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(29, 29, 29))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(jClassBox, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jClassBox, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jWefTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jChangeClassButton))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                 .addComponent(jClassSelectButton))
             .addGroup(jPanel4Layout.createSequentialGroup()
@@ -1190,122 +1238,136 @@ public class TTCreation extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jTextField1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseClicked
-        if(jTextField1.getText().equals("(Search Faculty And Subjects)"))
-        {
+        if (jTextField1.getText().equals("(Search Faculty And Subjects)")) {
             jTextField1.setText("");
         } // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1MouseClicked
 
     private void jClassBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jClassBoxActionPerformed
-if(jClassBox.getSelectedIndex()>0)
-    jClassSelectButton.setEnabled(true);
-else
-    jClassSelectButton.setEnabled(false);
+        toggleClassSelectionButton();
     }//GEN-LAST:event_jClassBoxActionPerformed
 
+    private void toggleClassSelectionButton() {
+        if (jClassBox.getSelectedIndex() > 0 && 
+           jWefTextField.getText().length() >= 8) {
+            jClassSelectButton.setEnabled(true);
+        } else {
+            jClassSelectButton.setEnabled(false);
+        }
+    }
+
     private void jTimeTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTimeTableMouseClicked
-       int column=jTimeTable.getSelectedColumn();
-       int row=jTimeTable.getSelectedRow();
-      // System.out.println("RC "+row+" "+column);
-       listModel.clear();
-      /// jList1.setData;
-       if(row<0 || column <1)
-           return;
-       selectedRowColumn[0]=row;
-       selectedRowColumn[1]=column;
-       String val=""+timeTableModel.getValueAt(row, column);
-       //System.out.println(val);
-       if(val==null || val.length()<1 ||val.equals("null"))
-       {String dayid=days[row].getDayId();
-           jClearSelectionButton.setEnabled(false);
-       String timeSlotId=periods[column-1].getId();
-     //  facultySubjectDetails=TimeTableControl.getAvailableFacultyDetails(timeSlotId,
-     //          dayid,selectedClass.getId());
-       updateList(dayid, timeSlotId);
-       }
-       else{
-           jClearSelectionButton.setEnabled(true);
-       }
+        int column = jTimeTable.getSelectedColumn();
+        int row = jTimeTable.getSelectedRow();
+        // System.out.println("RC "+row+" "+column);
+        listModel.clear();
+        /// jList1.setData;
+        if (row < 0 || column < 1) {
+            return;
+        }
+        selectedRowColumn[0] = row;
+        selectedRowColumn[1] = column;
+        String val = "" + timeTableModel.getValueAt(row, column);
+        //System.out.println(val);
+        if (val == null || val.length() < 1 || val.equals("null")) {
+            String dayid = days[row].getDayId();
+            jClearSelectionButton.setEnabled(false);
+            String timeSlotId = periods[column - 1].getId();
+            //  facultySubjectDetails=TimeTableControl.getAvailableFacultyDetails(timeSlotId,
+            //          dayid,selectedClass.getId());
+            updateList(dayid, timeSlotId);
+        } else {
+            jClearSelectionButton.setEnabled(true);
+        }
     }//GEN-LAST:event_jTimeTableMouseClicked
-   
-    private void increaseSubCount(String subjectId){
+
+    private void increaseSubCount(String subjectId) {
         changeSubCount(subjectId, 1);
     }
-    private void decreaseSubCount(String subjectId){
+
+    private void decreaseSubCount(String subjectId) {
         changeSubCount(subjectId, -1);
     }
-    private void changeSubCount(String subjectId, int val)
-    {
-        if (subjectId == null || subjectId.isBlank() || subjectId.equalsIgnoreCase("free"))
+
+    private void changeSubCount(String subjectId, int val) {
+        if (subjectId == null || subjectId.isBlank() || subjectId.equalsIgnoreCase("free")) {
             return;
+        }
         System.out.println("-----ChangeSubCount----");
-        System.out.println("subjectId "+subjectId);
+        System.out.println("subjectId " + subjectId);
         var facSub = allFacSubDetailsMap.get(subjectId);
-        int index= facSub.index;
-        System.out.println("index : "+index);
-        if (val < 0)
+        int index = facSub.index;
+        System.out.println("index : " + index);
+        if (val < 0) {
             facSub.decLect();
-        else 
+        } else {
             facSub.incLect();
-        subjectTableModel.setValueAt(facSub.getLectAssigned()
-                , index, 2);
+        }
+        subjectTableModel.setValueAt(facSub.getLectAssigned(),
+                 index, 2);
         checkConstraints();
         System.out.println("---------------------------");
     }
-    
-    private void checkConstraints(){
-        int c=1;
+
+    private void checkConstraints() {
+        int c = 1;
         subjectTableModel.setRowCount(0);
         String color;
-        for(var facSub: allFacSubDetailsList){
-           // System.out.println(facSub);
-            if(!facSub.meetsRequirements())
-            {
-                c=0;
+        for (var facSub : allFacSubDetailsList) {
+            // System.out.println(facSub);
+            if (!facSub.meetsRequirements()) {
+                c = 0;
                 color = "#ff0000";
-            }
-            else
-            {
+            } else {
                 color = "#00ff00";
             }
-                //System.out.println(allFacSubDetailsMap.get(i).getSubName()+" NOT OK");
-                subjectTableModel.addRow(
-                new Object[]{
-                    Utility.colorCodeValue(facSub.getSubName(), facSub.getColor()),
-                    Utility.colorCodeValue(""+facSub.getLectReq(), color),
-                    Utility.colorCodeValue(""+facSub.getLectAssigned(), color)
-                }
-                );
+            //System.out.println(allFacSubDetailsMap.get(i).getSubName()+" NOT OK");
+            subjectTableModel.addRow(
+                    new Object[]{
+                        Utility.colorCodeValue(facSub.getSubName(), facSub.getColor()),
+                        Utility.colorCodeValue("" + facSub.getLectReq(), color),
+                        Utility.colorCodeValue("" + facSub.getLectAssigned(), color)
+                    }
+            );
         }
-        if(c==1)
+        if (c == 1) {
             jSubmitButton.setEnabled(true);
-        else
+        } else {
             jSubmitButton.setEnabled(false);
+        }
     }
-    
+
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         leavePage();// TODO add your handling code here:
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void leavePage(){
-        Adminhomescreen.getAdminhomescreen();
-        if(roleOfUser == role.ADMIN)
-    Adminhomescreen.getAdminhomescreen();
-    else if(roleOfUser == role.FACULTY)
-    Facultyhomescreen.getFacultyhomescreen();
-    else if(roleOfUser == role.STUDENT)
-    Studenthomescreen.getStudenthomescreen();
-    else
-    System.exit(0);
+    private void leavePage() {
+        if (null == roleOfUser) {
+            System.exit(0);
+        } else {
+            switch (roleOfUser) {
+                case ADMIN:
+                    Adminhomescreen.getAdminhomescreen();
+                    break;
+                case FACULTY:
+                    Facultyhomescreen.getFacultyhomescreen();
+                    break;
+                case STUDENT:
+                    Studenthomescreen.getStudenthomescreen();
+                    break;
+                default:
+                    System.exit(0);
+            }
+        }
         this.dispose();
     }
-    
+
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
-        System.out.println("index at listEv "+selectedFacSubIndex);
-        if(jList1.getSelectedIndex()<0)
-        jFacultySelectButton.setEnabled(false);
-        else
-        {   System.out.println("val="+selectedFacSubIndex);
+        System.out.println("index at listEv " + selectedFacSubIndex);
+        if (jList1.getSelectedIndex() < 0)
+            jFacultySelectButton.setEnabled(false);
+        else {
+            System.out.println("val=" + selectedFacSubIndex);
             selectedFacSubIndex = jList1.getSelectedIndex();
             jFacultySelectButton.setEnabled(true);
         }
@@ -1316,158 +1378,208 @@ else
     }//GEN-LAST:event_jList1MouseReleased
 
     private void jClassSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jClassSelectButtonActionPerformed
-     jClassSelectButton.setEnabled(false);
-    jClassBox.setEnabled(false);
-    selectedClass=classes[jClassBox.getSelectedIndex()-1];
-    jFastSelectButton.setEnabled(true);
-    timeTables = new TimeTables(selectedClass.getId());
-    initTables();
+
+        selectedClass = classes[jClassBox.getSelectedIndex() - 1];
+        timeTables = new TimeTables(selectedClass.getId());
+        System.out.println(timeTables.isUpdateScheduled());
+        if (timeTables.isUpdateScheduled()) {
+            int res = JOptionPane.showConfirmDialog(this, "this class already has a time table "
+                    + "change scheduled.\n"
+                    + "if you choose to update schedule anyway, the current scheduled update will be discarded and deleted.\n"
+                    + "Are you sure you want to continue?\n\n"
+                    + "P.S. this message may also appear while you try to save the changes",
+                    "Change Already Scheduled", JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+            if (res != JOptionPane.YES_OPTION) {
+                return;
+            }
+        }
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MM-yyyy");
+            LocalDate wef = LocalDate.parse(jWefTextField.getText(), formatter);
+            LocalDate today = LocalDate.now();
+            if (!wef.isAfter(today)) {
+                JOptionPane.showMessageDialog(this, "kindly choose wef such that  wef is after today",
+                        "Invalid Date", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            this.wef = wef;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Invalid Date Format\nkindly rectify the error in wef date",
+                    "Invalid Date", JOptionPane.ERROR_MESSAGE);
+           System.err.println(e.getMessage()+"\n");
+           Logger.getLogger(TTCreation.class.getName()).log(Level.SEVERE, null, e);
+            return;
+        }
+        jClassSelectButton.setEnabled(false);
+        jClassBox.setEnabled(false);
+        jWefTextField.setEnabled(false);
+        jChangeClassButton.setEnabled(true);
+        jFastSelectButton.setEnabled(true);
+        jClearAllButton.setEnabled(true);
+        jClearSelectionButton.setEnabled(true);
+        jAutomateButton.setEnabled(true);
+        jLoadButton.setEnabled(true);
+        initTables();
     }//GEN-LAST:event_jClassSelectButtonActionPerformed
 
     private void jFacultySelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFacultySelectButtonActionPerformed
-       listModel.clear();
-       jClearSelectionButton.setEnabled(true);
-       if (selectedFacSubIndex == availableFacSubDetailsList.size())
-       {
-            updateCell(selectedRowColumn[0], selectedRowColumn[1]-1, "FREE");
+        listModel.clear();
+        jClearSelectionButton.setEnabled(true);
+        if (selectedFacSubIndex == availableFacSubDetailsList.size()) {
+            updateCell(selectedRowColumn[0], selectedRowColumn[1] - 1, "FREE");
             return;
-       }
-       var facSub = availableFacSubDetailsList.get(selectedFacSubIndex);
-       if (facSub == null)
-           return;
-       updateCell(selectedRowColumn[0], selectedRowColumn[1]-1, facSub);
+        }
+        var facSub = availableFacSubDetailsList.get(selectedFacSubIndex);
+        if (facSub == null) {
+            return;
+        }
+        updateCell(selectedRowColumn[0], selectedRowColumn[1] - 1, facSub);
     }//GEN-LAST:event_jFacultySelectButtonActionPerformed
 
     private void jSubmitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSubmitButtonActionPerformed
-        int count=0;
-        String classId=selectedClass.getId();
-        ArrayList<Schedule> schedule=new ArrayList<>();
-        for(int i=0;i<days.length;i++)
-           for(int j=0;j<periods.length;j++)
-           {
-               if(timeTable[i][j]== null || timeTable[i][j].isBlank() || 
-                       timeTable[i][j].equalsIgnoreCase("free"))
-                   continue;
-               count++;
-               String timeslotId = periods[j].getId();
-               String dayId = days[i].getDayId();
-               String fac_sub = timeTable[i][j];
-               String facultyId = fac_sub.substring(0, fac_sub.indexOf("_"));
-               String subjectId = fac_sub.substring(fac_sub.indexOf("_")+1);
-              int roomId=TimeTableControl.getRoomId(classId, subjectId, facultyId);
-              schedule.add(new Schedule(dayId,timeslotId,classId,subjectId,facultyId,roomId));
-           }
-       TimeTableControl.createTimeTable(schedule);
-       leavePage();
+        int count = 0;
+        String classId = selectedClass.getId();
+        ArrayList<Schedule> schedule = new ArrayList<>();
+        System.out.println(Arrays.deepToString(timeTable));
+        for (int i = 0; i < days.length; i++) {
+            for (int j = 0; j < periods.length; j++) {
+                if (timeTable[i][j] == null || timeTable[i][j].isBlank()
+                        || timeTable[i][j].equalsIgnoreCase("free")) {
+                    continue;
+                }
+                count++;
+                String timeslotId = periods[j].getId();
+                String dayId = days[i].getDayId();
+                String fac_sub = timeTable[i][j];
+                String facultyId = fac_sub.substring(0, fac_sub.indexOf("_"));
+                String subjectId = fac_sub.substring(fac_sub.indexOf("_") + 1);
+                int roomId = TimeTableControl.getRoomId(classId, subjectId, facultyId);
+                schedule.add(new Schedule(dayId, timeslotId, classId, subjectId, facultyId, roomId));
+            }
+        }
+        TimeTableControl.createTimeTable(selectedClass.getId(), schedule, wef);
+        leavePage();
     }//GEN-LAST:event_jSubmitButtonActionPerformed
 
     private void jClearSelectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jClearSelectionButtonActionPerformed
-        clearSelection(selectedRowColumn[0], selectedRowColumn[1]-1);
+        clearSelection(selectedRowColumn[0], selectedRowColumn[1] - 1);
         jClearSelectionButton.setEnabled(false);
     }//GEN-LAST:event_jClearSelectionButtonActionPerformed
-    private void clearSelection(int day, int period, boolean editLecturesCount)
-    {
-        if (editLecturesCount)
-        {
-            String sub=timeTable[day][period];
-            System.out.println("sub: "+sub);
-            if(sub==null||sub.equals("null"))
+    private void clearSelection(int day, int period, boolean editLecturesCount) {
+        if (editLecturesCount) {
+            String sub = timeTable[day][period];
+            System.out.println("sub: " + sub);
+            if (sub == null || sub.equals("null")) {
                 return;
-            if (!sub.equalsIgnoreCase("free"))
-            {
-                sub = sub.substring(sub.indexOf("_")+1);
-                System.out.println("sub "+sub);
+            }
+            if (!sub.equalsIgnoreCase("free")) {
+                sub = sub.substring(sub.indexOf("_") + 1);
+                System.out.println("sub " + sub);
                 decreaseSubCount(sub);
             }
         }
-        timeTable[day][period]=null;
-        timeTableModel.setValueAt("", day,period + 1);
+        timeTable[day][period] = null;
+        timeTableModel.setValueAt("", day, period + 1);
     }
-    private void clearSelection(int day, int period)
-    {
+
+    private void clearSelection(int day, int period) {
         clearSelection(day, period, true);
     }
-    
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-      sugestSchedulev3();
-    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jAutomateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jAutomateButtonActionPerformed
+        sugestSchedulev3();
+    }//GEN-LAST:event_jAutomateButtonActionPerformed
 
     private void jClearAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jClearAllButtonActionPerformed
-    clearTable();
+        clearTable();
     }//GEN-LAST:event_jClearAllButtonActionPerformed
-FastSelection fastSelection;
+    FastSelection fastSelection;
     private void jFastSelectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFastSelectButtonActionPerformed
         this.setVisible(false);
         fastSelection = new FastSelection();
-        for (int i = 0;i < days.length; i++)
-            for(int j = 0; j < periods.length; j++)
-            {
+        for (int i = 0; i < days.length; i++) {
+            for (int j = 0; j < periods.length; j++) {
                 var id = timeTable[i][j];
                 FastSelection.SelectionValue value;
-                if (id == null || id.isBlank())
+                if (id == null || id.isBlank()) {
                     value = FastSelection.SelectionValue.None;
-                else
-                {
-                    if (!id.equalsIgnoreCase("free"))
+                } else {
+                    if (!id.equalsIgnoreCase("free")) {
                         id = id.substring(id.indexOf('_') + 1);
+                    }
                     value = FastSelection.SelectionValue.Select;
                 }
                 fastSelection.add(id, i, j, value);
             }
+        }
         new Condition(allFacSubDetailsList, fastSelection, this).setVisible(true);
     }//GEN-LAST:event_jFastSelectButtonActionPerformed
 
     private void jLoadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoadButtonActionPerformed
-    ArrayList<String> data = timeTables.getTimeTablesList();
-    if (data.size() < 1)
-    {
-        JOptionPane.showMessageDialog(this, "no data found");
-        return;
-    }
-    ArrayList<String> values = new ArrayList();
-    for (var v : data)
-    {
-        values.add(timeTables.toPlainString(v) + "["+v+"]");
-    }
-    var r = JOptionPane.showInputDialog(this, "select one", "Select",
-            JOptionPane.QUESTION_MESSAGE, null, values.toArray(), null);
-    if (r == null)
-        return;
-    String result = r.toString();
-    String id = result.substring(result.indexOf('[')+1, result.indexOf(']'));
+        ArrayList<String> data = timeTables.getTimeTablesList();
+        if (data.size() < 1) {
+            JOptionPane.showMessageDialog(this, "no data found");
+            return;
+        }
+        ArrayList<String> values = new ArrayList();
+        for (var v : data) {
+            values.add(timeTables.toPlainString(v) + "[" + v + "]");
+        }
+        var r = JOptionPane.showInputDialog(this, "select one", "Select",
+                JOptionPane.QUESTION_MESSAGE, null, values.toArray(), null);
+        if (r == null) {
+            return;
+        }
+        String result = r.toString();
+        String id = result.substring(result.indexOf('[') + 1, result.indexOf(']'));
         initTableData(timeTables.fetchParticularTimeTable(id));
     }//GEN-LAST:event_jLoadButtonActionPerformed
-    
-    void applyFastSelection()
-    {
-        allFacSubDetailsList.forEach(v->v.resetLect());
-        for (int i = 0; i < days.length; i++)
-            for (int j = 0; j < periods.length; j++)
-            {
+
+    private void jWefTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jWefTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jWefTextFieldActionPerformed
+
+    private void jWefTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jWefTextFieldKeyTyped
+       toggleClassSelectionButton();
+    }//GEN-LAST:event_jWefTextFieldKeyTyped
+
+    private void jChangeClassButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jChangeClassButtonActionPerformed
+        new TTCreation().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jChangeClassButtonActionPerformed
+
+    void applyFastSelection() {
+        allFacSubDetailsList.forEach(v -> v.resetLect());
+        
+        for (int i = 0; i < days.length; i++) {
+            for (int j = 0; j < periods.length; j++) {
                 var cell = fastSelection.cellValues[i][j];
                 var id = cell.id;
-                if (cell.value == FastSelection.SelectionValue.Select)
-                {
-                   // if (!id.equalsIgnoreCase(getSubID(timeTable[i][j])))
+                System.out.println(i+" "+j+" "+cell.id);
+                if (cell.value == FastSelection.SelectionValue.Select) {
+                    // if (!id.equalsIgnoreCase(getSubID(timeTable[i][j])))
                     //{
                     //    decreaseSubCount(getSubID(timeTable[i][j]));
-                        updateCell(i, j, id);
-                   // }
-                }
-                else if(id.equalsIgnoreCase(getSubID(timeTable[i][j])))
+                    updateCell(i, j, id);
+                    // }
+                } else if (id.equalsIgnoreCase(getSubID(timeTable[i][j]))) {
                     clearSelection(i, j, false);
+                }
             }
+        }
     }
-    
-    private String getSubID(String id)
-    {
-        if (id == null || id.isBlank())
+
+    private String getSubID(String id) {
+        if (id == null || id.isBlank()) {
             return null;
-        else if (id.equalsIgnoreCase("free"))
+        } else if (id.equalsIgnoreCase("free")) {
             return id;
-        else
+        } else {
             return id.substring(id.indexOf("_") + 1);
+        }
     }
+
     /**
      * @param args the command line arguments
      */
@@ -1504,8 +1616,9 @@ FastSelection fastSelection;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jAutomateButton;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jChangeClassButton;
     private javax.swing.JComboBox<String> jClassBox;
     private javax.swing.JButton jClassSelectButton;
     private javax.swing.JButton jClearAllButton;
@@ -1528,5 +1641,6 @@ FastSelection fastSelection;
     private javax.swing.JButton jSubmitButton;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTable jTimeTable;
+    private javax.swing.JTextField jWefTextField;
     // End of variables declaration//GEN-END:variables
 }

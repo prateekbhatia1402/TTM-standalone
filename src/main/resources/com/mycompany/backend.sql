@@ -76,7 +76,6 @@ CREATE TABLE `parent details` (
   CONSTRAINT `parent_mobiles` CHECK (((`father mobile number` is not null) or (`mother mobile number` is not null)))
 );
 
-
 CREATE TABLE `student` (
   `REGISTRATION ID` varchar(6) NOT NULL,
   `STUDENT NAME` varchar(20) NOT NULL,
@@ -173,7 +172,7 @@ CREATE TABLE `schedule` (
   `LAST UPDATED` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `UPDATED BY` int not null,
   `FROM` date NOT NULL,
-  `TO` date NOT NULL,
+  `TO` date NULL,
   `STATUS` enum('active', 'inactive', 'incoming', 'outgoing'),
   `DAY ID` char(2) NOT NULL,
   `TIMESLOT ID` varchar(10) NOT NULL,

@@ -37,7 +37,10 @@ public class ParentDetails implements Serializable {
         this.parentId = parentId;
     }
 
-    private ParentDetails(String parentId, String fatherName, String fatherEmailId, String fatherMobileNumber,Date fatherDob , String motherName, String motherEmail, String motherMobileNumber, Date motherDob,String familyIncome,Student student) {
+    private ParentDetails(String parentId, String fatherName, 
+            String fatherEmailId, String fatherMobileNumber,Date fatherDob , 
+            String motherName, String motherEmail, String motherMobileNumber, 
+            Date motherDob,String familyIncome,Student student) {
         this.parentId = parentId;
         this.fatherName = fatherName;
         this.fatherEmailId = fatherEmailId;

@@ -20,7 +20,7 @@ public class ParentDetailsControl {
  private static final String TABLE_NAME="`parent details`";
  private static final String[] COLUMN_NAMES_PLN = 
  {
-    "PARENT ID","STUDENT REGISTRATION ID","FATHER NAME",
+    "PARENT ID","FATHER NAME",
     "FATHER EMAIL ID","FATHER MOBILE NUMBER","FATHER DOB",
     "MOTHER NAME","MOTHER EMAIL","MOTHER MOBILE NUMBER",
     "MOTHER DOB","FAMILY INCOME"
@@ -36,8 +36,7 @@ public class ParentDetailsControl {
    "`"+COLUMN_NAMES_PLN[6]+  "`",
    "`"+COLUMN_NAMES_PLN[7]+  "`",
    "`"+COLUMN_NAMES_PLN[8]+  "`",
-   "`"+COLUMN_NAMES_PLN[9]+  "`",
-   "`"+COLUMN_NAMES_PLN[10]+  "`",
+   "`"+COLUMN_NAMES_PLN[9]+  "`"
  };
     public static String getInsertStatement(int id,ParentDetails pd){
         if(id==999)
@@ -46,9 +45,9 @@ public class ParentDetailsControl {
             System.out.println(fatherDob+" ::");
             String motherDob=pd.getMotherDob().toPlainString();
             System.out.println(fatherDob+" "+motherDob);
-            String query=String.format("insert into %s values('%s','%s','%s','%s'"
+            String query=String.format("insert into %s values('%s','%s','%s'"
                     + ",'%s','%s','%s','%s','%s','%s','%s');"
-        ,TABLE_NAME,pd.getParentId(),pd.getStudent().getRegistrationId()
+        ,TABLE_NAME,pd.getParentId()
         ,pd.getFatherName(),pd.getFatherEmailId(),pd.getFatherMobileNumber()
         ,fatherDob,pd.getMotherName(),pd.getMotherEmail(),pd.getMotherMobileNumber(),
         motherDob,pd.getFamilyIncome());
@@ -62,22 +61,22 @@ public class ParentDetailsControl {
     public static String getUpdateStatement(String oldId,ParentDetails pr){
           /*
         
-    "`PARENT ID`","`STUDENT REGISTRATION ID`","`FATHER NAME`",
+    "`PARENT ID`","`FATHER NAME`",
     "`FATHER EMAIL ID`","`FATHER MOBILE NUMBER`","`FATHER DOB`",
     "`MOTHER NAME`","`MOTHER EMAIL`","`MOTHER MOBILE NUMBER`",
     "`MOTHER DOB`","`FAMILY INCOME`"
         */
        String query=String.format("update %s set %s='%s', %s='%s', %s='%s',%s='%s'"
                +", %s='%s', %s='%s', %s='%s', %s='%s', %s='%s' where %s='%s'"
-        ,TABLE_NAME,COLUMN_NAMES[2], pr.getFatherName(),
-        COLUMN_NAMES[3], pr.getFatherEmailId(),
-        COLUMN_NAMES[4], pr.getFatherMobileNumber(),
-        COLUMN_NAMES[5], pr.getFatherDob(),
-        COLUMN_NAMES[6], pr.getMotherName(),
-        COLUMN_NAMES[7], pr.getMotherEmail(),
-        COLUMN_NAMES[8], pr.getMotherMobileNumber(),
-        COLUMN_NAMES[9], pr.getMotherDob(),
-        COLUMN_NAMES[10], pr.getFamilyIncome(),
+        ,TABLE_NAME,COLUMN_NAMES[1], pr.getFatherName(),
+        COLUMN_NAMES[2], pr.getFatherEmailId(),
+        COLUMN_NAMES[3], pr.getFatherMobileNumber(),
+        COLUMN_NAMES[4], pr.getFatherDob(),
+        COLUMN_NAMES[5], pr.getMotherName(),
+        COLUMN_NAMES[6], pr.getMotherEmail(),
+        COLUMN_NAMES[7], pr.getMotherMobileNumber(),
+        COLUMN_NAMES[8], pr.getMotherDob(),
+        COLUMN_NAMES[9], pr.getFamilyIncome(),
         COLUMN_NAMES[0], oldId);
             System.out.println(query);
         return query;
@@ -101,22 +100,22 @@ public class ParentDetailsControl {
             ResultSet rs=st.executeQuery(query);
             /*
             
-    "`PARENT ID`","`STUDENT REGISTRATION ID`","`FATHER NAME`",
+    "`PARENT ID`","`FATHER NAME`",
     "`FATHER EMAIL ID`","`FATHER MOBILE NUMBER`","`FATHER DOB`",
     "`MOTHER NAME`","`MOTHER EMAIL`","`MOTHER MOBILE NUMBER`",
     "`MOTHER DOB`","`FAMILY INCOME`"
             */
             if(rs.next())
             {
-                String fatherName=rs.getString(COLUMN_NAMES_PLN[2]);
-                String fatherEmail=rs.getString(COLUMN_NAMES_PLN[3]);
-                String fatherMobile=rs.getString(COLUMN_NAMES_PLN[4]);
-                Date fatherDob=new Date(rs.getDate(COLUMN_NAMES_PLN[5]));
-                String motherName=rs.getString(COLUMN_NAMES_PLN[6]);
-                String motherEmail=rs.getString(COLUMN_NAMES_PLN[7]);
-                String motherMobile=rs.getString(COLUMN_NAMES_PLN[8]);
-                Date motherDob=new Date(rs.getDate(COLUMN_NAMES_PLN[9]));
-                String familyIncome=rs.getString(COLUMN_NAMES_PLN[10]);
+                String fatherName=rs.getString(COLUMN_NAMES_PLN[1]);
+                String fatherEmail=rs.getString(COLUMN_NAMES_PLN[2]);
+                String fatherMobile=rs.getString(COLUMN_NAMES_PLN[3]);
+                Date fatherDob=new Date(rs.getDate(COLUMN_NAMES_PLN[4]));
+                String motherName=rs.getString(COLUMN_NAMES_PLN[5]);
+                String motherEmail=rs.getString(COLUMN_NAMES_PLN[6]);
+                String motherMobile=rs.getString(COLUMN_NAMES_PLN[7]);
+                Date motherDob=new Date(rs.getDate(COLUMN_NAMES_PLN[8]));
+                String familyIncome=rs.getString(COLUMN_NAMES_PLN[9]);
                 parentDetails=ParentDetails.createParentDetails(parentId, fatherName,
                         fatherEmail, fatherMobile, fatherDob,motherName,
                         motherEmail, motherMobile,motherDob, familyIncome,null);

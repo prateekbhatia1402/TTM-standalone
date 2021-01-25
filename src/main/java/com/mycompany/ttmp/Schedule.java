@@ -7,27 +7,58 @@ package com.mycompany.ttmp;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 /**
  *
  * @author Programming
  */
 public class Schedule implements Serializable {
 
+    public String getTimeTableId() {
+        return timeTableId;
+    }
+
+    public void setTimeTableId(String timeTableId) {
+        this.timeTableId = timeTableId;
+    }
+
+    public int getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(int updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public status getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(status currentStatus) {
+        this.currentStatus = currentStatus;
+    }
+    public enum status{
+        ACTIVE, INACTIVE, INCOMING, OUTGOING
+    }
+
     private static final long serialVersionUID = 1L;
     private int scheduleId;
+    private String timeTableId;
+    private LocalDateTime lastUpdated;
+    private int updatedBy;
+    private LocalDate from;
+    private LocalDate till;
+    private status currentStatus;
     private String dayId;
     private String timeslotId;
     private String classId;
     private String subjectId;
     private String facultyId;
-    private LocalDate lastUpdated;
-    private LocalDate from;
-    private LocalDate till;
     private int roomId;
-    private LocalDate wef;
 
 
-    public Schedule( String dayId, String timeslotId, String classId, String subjectId, String facultyId, int roomId) {
+    public Schedule( String dayId, String timeslotId, String classId,
+            String subjectId, String facultyId, int roomId) {
          this.dayId = dayId;
         this.timeslotId = timeslotId;
         this.classId = classId;
@@ -36,13 +67,17 @@ public class Schedule implements Serializable {
         this.roomId = roomId;
     }
     
-    public Schedule( int id,LocalDate from,LocalDate till,String dayId,
-            String timeslotId, String classId, String subjectId, 
-            String facultyId, int roomId)
-    {
-        this.scheduleId = id;
+     Schedule( int id, String ttid, LocalDateTime updatedOn, int updatedBy,
+            LocalDate from, LocalDate till, status currentStatus,
+            String dayId, String timeslotId, String classId, String subjectId,
+            String facultyId, int roomId) {
+        this.scheduleId=id;
+        this.timeTableId = ttid;
+        this.lastUpdated = updatedOn;
+        this.updatedBy = updatedBy;
         this.from = from;
         this.till = till;
+        this.currentStatus = currentStatus;
         this.dayId = dayId;
         this.timeslotId = timeslotId;
         this.classId = classId;
@@ -50,16 +85,7 @@ public class Schedule implements Serializable {
         this.facultyId = facultyId;
         this.roomId = roomId;
     }
-    public Schedule( int id, LocalDate updatedOn, String dayId, String timeslotId, String classId, String subjectId, String facultyId, int roomId) {
-        this.scheduleId=id;
-        this.lastUpdated = updatedOn;
-        this.dayId = dayId;
-        this.timeslotId = timeslotId;
-        this.classId = classId;
-        this.subjectId = subjectId;
-        this.facultyId = facultyId;
-        this.roomId = roomId;
-    }
+     
     public int getScheduleId() {
         return scheduleId;
     }
@@ -115,18 +141,16 @@ public class Schedule implements Serializable {
         this.roomId = roomId;
     }
 
-    public LocalDate getLastUpdated() {
+    public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
 
     public LocalDate getFrom() {
-        return from == null ? wef : from;
+        return from;
     }
 
     public void setFrom(LocalDate from) {
-        if (this.from != null)
         this.from = from;
-        else wef = from;
     }
 
     public LocalDate getTill() {
@@ -136,15 +160,5 @@ public class Schedule implements Serializable {
     public void setTill(LocalDate till) {
         this.till = till;
     }
-
-    public LocalDate getWef() {
-        return wef;
-    }
-
-    public void setWef(LocalDate wef) {
-        this.wef = wef;
-    }
-
-
     
 }

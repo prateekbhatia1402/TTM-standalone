@@ -5,8 +5,6 @@
  */
 package com.mycompany.ttmp;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
@@ -91,12 +89,14 @@ public class VeiwTimeTable extends javax.swing.JFrame {
         if (!changeInProcess)
         {
             changeInProcess = true;
-            if (id.startsWith("C"))
-            {
-                if (timeTables == null || !timeTables.getClassId().equals(id))
+//            if (id.startsWith("C"))
+//            {
+                if (timeTables == null || !timeTables.tablesOf.equals(id))
                 {
                     timeTables = TimeTableControl.getTimeTablesList(id);
-                    jUseForCreationButton.setEnabled(true);
+                    
+                    if (roleOfUser == role.ADMIN)
+                        jUseForCreationButton.setEnabled(true);
                     updateTable(timeTables.fetchTimeTable(), id);
                     jVersionBox.removeAllItems();
                     timeTablesList = timeTables.getTimeTablesList();
@@ -116,13 +116,13 @@ public class VeiwTimeTable extends javax.swing.JFrame {
                         jVersionBox.setVisible(false);
                     }
                 }
-            }
-            else 
-            {
-                jUseForCreationButton.setEnabled(false);
-                jVersionBox.setVisible(false);
-                updateTable(TimeTableControl.getFacultyTimeTable(id),id);
-            }
+//            }
+//            else 
+//            {
+//                jUseForCreationButton.setEnabled(false);
+//                jVersionBox.setVisible(false);
+//                updateTable(TimeTableControl.getFacultyTimeTable(id),id);
+//            }
             changeInProcess = false;
         }
         
@@ -589,19 +589,25 @@ else    switch (roleOfUser) {
         if (jVersionBox.getSelectedIndex() < 0)
             return;
         String val = timeTablesList.get(jVersionBox.getSelectedIndex());
-        String id = val.contains("_") ? val.substring(0, val.indexOf("_")): val;
-        updateTable(timeTables.fetchParticularTimeTable(val), id);
+        updateTable(timeTables.fetchParticularTimeTable(val), timeTables.tablesOf);
     }//GEN-LAST:event_jVersionBoxActionPerformed
 
     private void jUseForCreationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUseForCreationActionPerformed
-      new TTCreation(timeTables, timeTables.lastFetched).setVisible(true);
-       this.dispose();    
+        if (timeTables == null || ! timeTables.isTablesOfAClass())
+        {
+            JOptionPane.showMessageDialog(this, "Please select time table of a class first",
+                    "Invalid Operation", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        new TTCreation(timeTables, timeTables.lastFetched).setVisible(true);
+        this.dispose();    
     }//GEN-LAST:event_jUseForCreationActionPerformed
 
     
     private void updateTable(ArrayList<Schedule> schedule,String id){
         if(schedule==null || schedule.size()<1){
-            JOptionPane.showMessageDialog(this, "Time table does not exist for the selection");
+            JOptionPane.showMessageDialog(this, "Time table does not exist"
+                    + " for the selection");
             return;
         }
             //System.out.println("Updating table : "+LocalDateTime.now());

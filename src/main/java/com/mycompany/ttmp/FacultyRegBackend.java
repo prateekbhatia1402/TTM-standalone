@@ -25,15 +25,15 @@ public class FacultyRegBackend {
         c=SqlConnect.getDatabaseConnection();
         c.setAutoCommit(false);
         Statement s=c.createStatement();
-        String query=FacultyControl.getInsertStatement(999, ft);
+        String query=AccountControl.getInsertStatement(999, ac);
+        s.executeUpdate(query);
+        query=FacultyControl.getInsertStatement(999, ft);
         String[] queries=query.split(";");
         //System.out.println(Arrays.toString(queries));
         for(String q:queries){
             System.out.println(q+";");
         s.executeUpdate(q+";");
         }
-        query=AccountControl.getInsertStatement(999, ac);
-        s.executeUpdate(query);
         c.commit();
      } catch (SQLException ex) {
          System.out.println("!!!! message "+ex.getMessage());

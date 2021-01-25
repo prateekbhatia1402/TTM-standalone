@@ -533,16 +533,29 @@ else if (value.equalsIgnoreCase("update / View subject & Faculty assignment"))
                             e.getX(), e.getY());
             }
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        if(roleOfUser.equals("admin"))
-    Adminhomescreen.getAdminhomescreen();
-else if(roleOfUser.equals("faculty"))
-    Facultyhomescreen.getFacultyhomescreen();
-else if(roleOfUser.equals("student"))
-    Studenthomescreen.getStudenthomescreen();
-else
-    System.exit(0);
-    this.dispose();        // TODO add your handling code here:
+   leavePage();       // TODO add your handling code here:
     }//GEN-LAST:event_jButton7ActionPerformed
+  
+    private void leavePage() {
+        if (null == roleOfUser) {
+            System.exit(0);
+        } else {
+            switch (roleOfUser) {
+                case ADMIN:
+                    Adminhomescreen.getAdminhomescreen();
+                    break;
+                case FACULTY:
+                    Facultyhomescreen.getFacultyhomescreen();
+                    break;
+                case STUDENT:
+                    Studenthomescreen.getStudenthomescreen();
+                    break;
+                default:
+                    System.exit(0);
+            }
+        }
+        this.dispose();
+    }
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
       readyForModify=true;

@@ -19,6 +19,7 @@ public class TTM {
          try {
            SqlConnect.getDatabaseConnection();
             new LoginF().setVisible(true);
+            ScheduleScripts.runUpdateScheduleStatus();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage().toLowerCase());
             if(ex.getMessage().toLowerCase().equals(SqlConnect.UNKNOWN_DATABASE_ERROR_MESSAGE))

@@ -15,32 +15,47 @@ import java.util.logging.Logger;
 /**
  *
  * @author User
-CREATE TABLE `STUDENT` (
-    `REGISTRATION ID`,
-    `STUDENT NAME`,
-    `EMAIL`,
-    `MOBILE NUMBER`,
-    `CLASS`,
-    `PERMANENT Address`,
-    `CORR. ADDRESS`,
-    `ROLL NUMBER`,
-    `DATE OF BIRTH`,
-    `DATE OF REGISTRATION`,
-    `GENDER` CHAR(1),
-    `BLOOD GROUP`,
-    `PARENT ID`,
-    PRIMARY KEY (`REGISTRATION ID`)
+
+CREATE TABLE `student` (
+  `REGISTRATION ID` varchar(6) NOT NULL,
+  `STUDENT NAME` varchar(20) NOT NULL,
+  `EMAIL` varchar(35) NOT NULL,
+  `USERNAME` varchar(20) NOT NULL,
+  `mobile number` varchar(10) DEFAULT NULL,
+  `CLASS` varchar(6) DEFAULT NULL,
+  `PERMANENT Address` varchar(60) NOT NULL,
+  `CORR. ADDRESS` varchar(60) NOT NULL,
+  `ROLL NUMBER` int NOT NULL,
+  `DATE OF BIRTH` date NOT NULL,
+  `date of registration` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `GENDER` char(1) NOT NULL,
+  `BLOOD GROUP` varchar(3) DEFAULT NULL,
+  `PARENT ID` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`REGISTRATION ID`),
+  KEY `USERNAME` (`USERNAME`),
+  KEY `PARENT ID` (`PARENT ID`),
+  CONSTRAINT `student_ibfk_1` FOREIGN KEY (`USERNAME`) REFERENCES `account` (`USERNAME`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_ibfk_2` FOREIGN KEY (`PARENT ID`) REFERENCES `parent details` (`PARENT ID`) ON DELETE CASCADE
 );
  */
 public class StudentControl {
     private static final String TABLE_NAME="`student`";
     private static final String[] COLUMN_NAMES_PLN =
     { 
-    "REGISTRATION ID","STUDENT NAME","EMAIL","USERNAME",
-    "MOBILE NUMBER","CLASS","PERMANENT Address",
-    "CORR. ADDRESS","ROLL NUMBER","DATE OF BIRTH",
-    "DATE OF REGISTRATION","GENDER","BLOOD GROUP",
-    "PARENT ID"  
+        "REGISTRATION ID",
+        "STUDENT NAME",
+        "EMAIL",
+        "USERNAME",        
+        "MOBILE NUMBER",
+        "CLASS",
+        "PERMANENT Address",
+        "CORR. ADDRESS",
+        "ROLL NUMBER",
+        "DATE OF BIRTH",
+        "DATE OF REGISTRATION",
+        "GENDER",
+        "BLOOD GROUP",
+        "PARENT ID"  
     };
     private static final String[] COLUMN_NAMES =
     { 
@@ -60,24 +75,25 @@ public class StudentControl {
     "`"+COLUMN_NAMES_PLN[13]+"`",
     };
     public static String getInsertStatement(int id,Student st){
-        if(id==999)
+        if(id==999 || id == 6969)
         {  
             String clas=null;
             if(st.getClass1()!=null)
                 clas=st.getClass1().getId();
             System.out.println(clas);
+            String dor = id != 6969 ? "null" : st.getDateOfRegistration().toPlainString();
             String query=String.format("insert into %s(%s) values('%s','%s','%s','%s',"
-                + "'%s','%s','%s',%d,'%s','%s','%c','%s',%s,'%s');"
+                + "'%s','%s','%s',%d,'%s','%s','%c','%s','%s','%s');"
         ,TABLE_NAME,COLUMN_NAMES[0]+","+COLUMN_NAMES[1]+","+COLUMN_NAMES[3]+","+
                 COLUMN_NAMES[2]+","+COLUMN_NAMES[4]+","+COLUMN_NAMES[6]+","+COLUMN_NAMES[7]+
-                    ","+COLUMN_NAMES[8]+","+COLUMN_NAMES[9]+","
-       +COLUMN_NAMES[10]+","+COLUMN_NAMES[11]+","+COLUMN_NAMES[12]+","+COLUMN_NAMES[13]
+                    ","+COLUMN_NAMES[8]+","+COLUMN_NAMES[9]+"," + COLUMN_NAMES[10]
+      +"," +COLUMN_NAMES[11]+","+COLUMN_NAMES[12]+","+COLUMN_NAMES[13]
                +","+COLUMN_NAMES[5]  
         ,st.getRegistrationId(),st.getStudentName(),st.getUsername()
         ,st.getEmail(),st.getMobileNumber(),
         st.getPermanentAddress(),st.getAddress(),st.getRollNumber(),
-        st.getDateOfBirth().toPlainString(),st.getDateOfRegistration().toPlainString(),
-        st.getGender(),st.getBloodGroup(),"null", clas);
+        st.getDateOfBirth().toPlainString(), dor,
+        st.getGender(),st.getBloodGroup(),st.getParentId(), clas);
             System.out.println(query);
         return query;
          }

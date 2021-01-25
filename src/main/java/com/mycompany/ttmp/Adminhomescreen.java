@@ -40,6 +40,7 @@ public class Adminhomescreen extends javax.swing.JFrame {
     public static void getAdminhomescreen(){
         Adminhomescreen a=createAdminhomescreen();
         a.setVisible(true);
+        a.setAlwaysOnTop(true);
     }
     public static void getAdminhomescreen(Admin admin){
         Adminhomescreen a=createAdminhomescreen(admin);
