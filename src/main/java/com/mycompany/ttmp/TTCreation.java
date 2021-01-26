@@ -198,7 +198,8 @@ class FacSub {
 
     @Override
     public String toString() {
-        return "FacSub{" + "facId=" + facId + ", facName=" + facName + ", subId=" + subId + ", subName=" + subName + ", lectReq="
+        return "FacSub{" + "facId=" + facId + ", facName=" + facName + 
+                ", subId=" + subId + ", subName=" + subName + ", lectReq="
                 + lectReq + ", lectAssigned=" + lectAssigned + '}';
     }
 
@@ -407,6 +408,32 @@ public class TTCreation extends javax.swing.JFrame {
                     new Object[]{Utility.colorCodeValue(facSub.getSubName(),
                                 facSub.getColor()), facSub.getLectReq(), 0});
         });
+        while (wef == null)
+        {
+            try
+            {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-mm-yyyy");
+           String date = JOptionPane.showInputDialog("specify date from which "
+                    + "schedule will come into effect\n type n or no to cancel the operation", 
+                    LocalDate.now().plusDays(1).format(formatter));
+           if (date.trim().toLowerCase().startsWith("n"))
+           {
+               leavePage();
+           }
+            LocalDate from = LocalDate.parse(date, formatter);
+            wef = from;
+            }
+            catch(Exception e){
+                System.out.println(e.getMessage());
+                int res = JOptionPane.showInternalConfirmDialog(this, 
+                        "date you entered was invalid, would you like to retry?",
+                        "Invalid Date", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (res != JOptionPane.YES_OPTION)
+                {
+                    leavePage();
+                }
+            }
+        }
         System.out.println(subjectTableModel.getRowCount());
         if (tid == null) {
             initTableData(timeTables.fetchLatestTimeTable());
@@ -1458,7 +1485,33 @@ public class TTCreation extends javax.swing.JFrame {
                 schedule.add(new Schedule(dayId, timeslotId, classId, subjectId, facultyId, roomId));
             }
         }
-        TimeTableControl.createTimeTable(selectedClass.getId(), schedule, wef);
+        int res = TimeTableControl.createTimeTable(selectedClass.getId(), schedule, wef);
+        String msg = "";int msg_type;String title = "";
+         switch(res)
+         {
+             case TimeTableControl.CRT_SUCCESS:
+                 msg = "RECORDS ADDED SUCCESSFULLY";
+                 title = "SUCCESS";
+                 msg_type = JOptionPane.INFORMATION_MESSAGE;
+                 break;
+             case TimeTableControl.CRT_FAILED_AD:
+                 msg = "user "+LoginF.getUserId()+" does not permission to do this task";
+                 msg_type = JOptionPane.WARNING_MESSAGE;
+                 title = "SUCCESS";
+                 break;
+             case TimeTableControl.CRT_FAILED_SQ:
+                 msg = "DATABASE ERROR";
+                 msg_type = JOptionPane.ERROR_MESSAGE;
+                 title = "SUCCESS";
+                 break;
+             case TimeTableControl.CRT_FAILED_ER:
+             default:
+                 msg = "Something went wrong";
+                 title = "Error Encountered";
+                 msg_type = JOptionPane.ERROR_MESSAGE;
+                 break;
+         }
+         JOptionPane.showMessageDialog(this, msg, title, msg_type);
         leavePage();
     }//GEN-LAST:event_jSubmitButtonActionPerformed
 

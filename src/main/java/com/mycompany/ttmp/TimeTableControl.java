@@ -858,6 +858,7 @@ public class TimeTableControl {/*
             if (to == null) {
                 to = LocalDate.now().plusYears(5);
             }
+            System.out.println(from+" "+to);
             String query = "select `day id`,`timeslot id`,`class id`,`subject id` "
                     + "from schedule where `faculty id`='" + id + "' and `from` <= '"
                     + to.format(DateTimeFormatter.ISO_DATE) + "'"
@@ -952,19 +953,20 @@ public class TimeTableControl {/*
         return -1;
     }
 
-    public static void createTimeTable(String classId, ArrayList<Schedule> schedule) {
-        createTimeTable(classId, schedule, LocalDate.now().plusDays(1));
+    public static final int CRT_SUCCESS = 1;
+    public static final  int CRT_FAILED_AD = 2;
+    public static final  int CRT_FAILED_ER = 4;
+    public static final int CRT_FAILED_SQ = 3;
+    
+    public static int createTimeTable(String classId, ArrayList<Schedule> schedule) {
+        return createTimeTable(classId, schedule, LocalDate.now().plusDays(1));
     }
 
-    public static void createTimeTable(String classId, ArrayList<Schedule> schedule,
+    public static int createTimeTable(String classId, ArrayList<Schedule> schedule,
             LocalDate wef) {
         if (LoginF.getUserRole() != role.ADMIN)
         {
-            JOptionPane.showMessageDialog(null, 
-                    LoginF.getUserRole().toString()+" don't have permission"
-                            + " to perform this operation", "Access Denied",
-                            JOptionPane.WARNING_MESSAGE);
-            return;
+            return CRT_FAILED_AD;
         }
         Connection con = null;
         try {
@@ -1012,17 +1014,22 @@ public class TimeTableControl {/*
             }
             con.commit();
             ScheduleScripts.runUpdateScheduleStatus();
-            JOptionPane.showMessageDialog(null, "RECORDS ADDED SUCCESSFULLY");
-        } catch (SQLException ex) {
+            return CRT_SUCCESS;
+        } 
+        catch (SQLException ex) {
             try {
                 con.rollback();
-                JOptionPane.showMessageDialog(null, "SOMETHING WENT WRONG");
             } catch (SQLException ex1) {
                 Logger.getLogger(TimeTableControl.class.getName()).log(Level.SEVERE, null, ex1);
             }
-            JOptionPane.showMessageDialog(null, "SOMETHING WENT WRONG");
             Logger.getLogger(TimeTableControl.class.getName()).log(Level.SEVERE, null, ex);
+            return CRT_FAILED_SQ;
         }
+        catch(Exception ex)
+        {
+            Logger.getLogger(TimeTableControl.class.getName()).log(Level.SEVERE, null, ex);    
+        }
+        return CRT_SUCCESS;
     }
 
     public static Subject[] getSubjects(String classId) {
