@@ -15,9 +15,14 @@ import javax.swing.JOptionPane;
     enum role {ADMIN, FACULTY, STUDENT};
 public class LoginF extends javax.swing.JFrame {
     private static role USER_ROLE = null;
+    private static String USER_ID = null;
     static role getUserRole()
     {
         return USER_ROLE;
+    }
+    static String getUserId()
+    {
+        return USER_ID;
     }
     /**
      * Creates new form LoginF
@@ -190,16 +195,19 @@ public class LoginF extends javax.swing.JFrame {
             case "admin":
                 USER_ROLE = role.ADMIN;
                 Admin admin=AdminControl.getAdmin(username, 'u');
+                USER_ID = ""+admin.getId();
                 Adminhomescreen.getAdminhomescreen(admin);
                 break;
             case "student":
                 USER_ROLE = role.STUDENT;
                 Student student=StudentControl.getStudentViaUsername(username);
+                USER_ID = student.getRegistrationId();
                 Studenthomescreen.getStudenthomescreen(student);
                 break;
             case "faculty":
                 USER_ROLE = role.FACULTY;
                 Faculty faculty= FacultyControl.getFacultyViaUsername(username);
+                USER_ID = faculty.getFacultyId();
                 Facultyhomescreen.getFacultyhomescreen(faculty);//new Facultyhomescreen().setVisible(true);
                 break;
         }

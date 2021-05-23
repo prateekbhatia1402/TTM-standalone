@@ -198,15 +198,22 @@ public class ClassManager extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
+        addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+                formWindowGainedFocus(evt);
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+            }
+        });
 
         jPanel5.setBackground(new java.awt.Color(0, 204, 204));
-        jPanel5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153), 10));
+        jPanel5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153)));
 
         jPanel6.setBackground(new java.awt.Color(153, 255, 255));
-        jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153), 10));
+        jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153)));
 
         jPanel11.setBackground(new java.awt.Color(51, 255, 255));
-        jPanel11.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153), 10));
+        jPanel11.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153)));
 
         jLabel8.setBackground(new java.awt.Color(51, 255, 255));
         jLabel8.setFont(new java.awt.Font("Times New Roman", 1, 36)); // NOI18N
@@ -243,7 +250,7 @@ public class ClassManager extends javax.swing.JFrame {
         );
 
         jPanel7.setBackground(new java.awt.Color(0, 204, 204));
-        jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153), 10));
+        jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153)));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -293,7 +300,7 @@ public class ClassManager extends javax.swing.JFrame {
         );
 
         jPanel2.setBackground(new java.awt.Color(0, 204, 204));
-        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153), 10));
+        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153)));
 
         jButton3.setFont(new java.awt.Font("Georgia", 1, 12)); // NOI18N
         jButton3.setForeground(new java.awt.Color(51, 51, 51));
@@ -453,7 +460,9 @@ int selectedIndex = -1;
         if (!tableModel.getValueAt(selectedIndex, 3).toString().equalsIgnoreCase("NOT ASSIGNED"))
             options.add("Update room");
     }
-    String value = JOptionPane.showInputDialog(this, "Choose option", "Update options",
+        System.out.println(options);
+    String value = JOptionPane.showInputDialog(this, "Choose option", 
+            "Update options",
         JOptionPane.QUESTION_MESSAGE, null, 
         options.toArray(), 
         options.get(0)).toString();
@@ -532,18 +541,32 @@ else if (value.equalsIgnoreCase("update / View subject & Faculty assignment"))
                     jPopupMenu1.show(e.getComponent(),
                             e.getX(), e.getY());
             }
+    
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        if(roleOfUser == role.ADMIN)
-    Adminhomescreen.getAdminhomescreen();
-else if(roleOfUser == role.FACULTY)
-    Facultyhomescreen.getFacultyhomescreen();
-else if(roleOfUser == role.STUDENT)
-    Studenthomescreen.getStudenthomescreen();
-else
-    System.exit(0);
-    this.dispose();        // TODO add your handling code here:
+   leavePage();       // TODO add your handling code here:                                        
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    private void leavePage() {
+        if (null == roleOfUser) {
+            System.exit(0);
+        } else {
+            switch (roleOfUser) {
+                case ADMIN:
+    Adminhomescreen.getAdminhomescreen();
+                    break;
+                case FACULTY:
+    Facultyhomescreen.getFacultyhomescreen();
+                    break;
+                case STUDENT:
+    Studenthomescreen.getStudenthomescreen();
+                    break;
+                default:
+    System.exit(0);        
+}
+    }
+        this.dispose();
+    }
+    
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
       readyForModify=true;
       modifyClass();
@@ -568,6 +591,10 @@ else
     else loadData(); // TODO add your handling code here:
     }//GEN-LAST:event_jSearchFieldKeyReleased
 
+    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
+        loadData();
+    }//GEN-LAST:event_formWindowGainedFocus
+                        
     private void loadData(String param){
        tableModel=(DefaultTableModel) jTable1.getModel();
         tableModel.setRowCount(0);

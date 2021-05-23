@@ -131,6 +131,8 @@ public class ClassandRoomManager extends javax.swing.JFrame {
         jUpdateButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setUndecorated(true);
+        setResizable(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153), 4), javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 255, 255), 5)));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -141,6 +143,8 @@ public class ClassandRoomManager extends javax.swing.JFrame {
         jPanel2.setLayout(null);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153), 5));
+        jPanel3.setMinimumSize(new java.awt.Dimension(113, 30));
+        jPanel3.setPreferredSize(new java.awt.Dimension(113, 30));
 
         jTypeSelectorBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Class", "Room" }));
         jTypeSelectorBox.addActionListener(new java.awt.event.ActionListener() {
@@ -157,7 +161,7 @@ public class ClassandRoomManager extends javax.swing.JFrame {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTypeSelectorBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, Short.MAX_VALUE)
+            .addComponent(jTypeSelectorBox)
         );
 
         jPanel2.add(jPanel3);
@@ -167,7 +171,7 @@ public class ClassandRoomManager extends javax.swing.JFrame {
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 153, 153), 5));
 
         jLabel1.setFont(new java.awt.Font("Ubuntu", 3, 36)); // NOI18N
-        jLabel1.setText("(Yaha Agar Class Select ki Hai toh Class Ayegi warna Room Ayega)  Managment(Size Badha Liyo)");
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -536,6 +540,7 @@ public class ClassandRoomManager extends javax.swing.JFrame {
     private void applyType(){
         if (currentType == 'c')
         {
+            jLabel1.setText("Class");
     jSplitPane1.setDividerLocation(1000);
     ArrayList<Room> rooms = RoomManager.getAvailableRooms();
     jRoomBox.removeAllItems();

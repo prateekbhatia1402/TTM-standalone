@@ -23,82 +23,92 @@ public class TeacherSub extends javax.swing.JFrame {
     private final DefaultListModel facultyListModel;
     private final DefaultTableModel model;
     private final I_Class[] classes;
+    private I_Class selectedClass;
     private final Faculty[] faculties;
     private final Subject[] subjects;
-    private final ArrayList<Subject> selectedSubjects=new ArrayList<>();
-    private ArrayList<Faculty> availableFaculties=new ArrayList<>();
-    private ArrayList<Subject> availableSubjects=new ArrayList<>();
-    private int selectedFacultyIndex=-1;
-    private int selectedSubjectIndex=-1;
-    private int newRowNumber=-1;
-    private int selectedRow=-1;
-    private boolean canAddRow=true;
-    private boolean rowEdit=false;
-    public static final int CREATE_MODE=1;
-    public static final int EDIT_MODE=2;
-    public static final int CREATE_OR_EDIT_MODE=12;
-    public static final int READ_MODE=3;
+    private final ArrayList<Subject> selectedSubjects = new ArrayList<>();
+    private ArrayList<Faculty> availableFaculties = new ArrayList<>();
+    private ArrayList<Subject> availableSubjects = new ArrayList<>();
+    private int selectedFacultyIndex = -1;
+    private int selectedSubjectIndex = -1;
+    private int newRowNumber = -1;
+    private int selectedRow = -1;
+    private boolean canAddRow = true;
+    private boolean rowEdit = false;
+    private boolean subjectsLocked = false;
+    public static final int CREATE_MODE = 1;
+    public static final int EDIT_MODE = 2;
+    public static final int CREATE_OR_EDIT_MODE = 12;
+    public static final int READ_MODE = 3;
     private int currentMode;
     private int modePermission;
+
     public TeacherSub() {
         initComponents();
-        subjectListModel=new DefaultListModel<>();
-        facultyListModel=new DefaultListModel<>();
+        subjectListModel = new DefaultListModel<>();
+        facultyListModel = new DefaultListModel<>();
         jFacultyList.setModel(facultyListModel);
         jSubjectList.setModel(subjectListModel);
         model = (DefaultTableModel) jTable1.getModel();
-        classes=I_ClassControl.getAllCLass();
-        faculties=FacultyControl.getAllFaculty();
-        subjects=SubjectControl.getAllSubject();
-        jComboBox1.removeAllItems();
-        jComboBox1.addItem("Select Class");
-        for(I_Class clas:classes)
-            jComboBox1.addItem(clas.getName());
+        classes = I_ClassControl.getAllCLass();
+        faculties = FacultyControl.getAllFaculty();
+        subjects = SubjectControl.getAllSubject();
+        jClassBox.removeAllItems();
+        jClassBox.addItem("Select Class");
+        for (I_Class clas : classes) {
+            jClassBox.addItem(clas.getName());
+        }
         jAddButton.setText("Add New Row");
         jEditRowButton.setEnabled(false);
-        
+
     }
-    
-    public TeacherSub(String classId,int pmode,int modePermission) {
+
+    public TeacherSub(String classId, int pmode, int modePermission) {
         initComponents();
-        currentMode=pmode;
-        this.modePermission=modePermission;
-        subjectListModel=new DefaultListModel<>();
-        facultyListModel=new DefaultListModel<>();
+        currentMode = pmode;
+        this.modePermission = modePermission;
+        subjectListModel = new DefaultListModel<>();
+        facultyListModel = new DefaultListModel<>();
         jFacultyList.setModel(facultyListModel);
         jSubjectList.setModel(subjectListModel);
         model = (DefaultTableModel) jTable1.getModel();
-        classes=I_ClassControl.getAllCLass();
-        faculties=FacultyControl.getAllFaculty();
-        subjects=SubjectControl.getAllSubject();
-        jComboBox1.removeAllItems();
-        jComboBox1.addItem("Select Class");
-        for(I_Class clas:classes)
-            jComboBox1.addItem(clas.getName());
+        classes = TimeTableControl.getClasses();
+        faculties = FacultyControl.getAllFaculty();
+        subjects = SubjectControl.getAllSubject();
+        jClassBox.removeAllItems();
+        jClassBox.addItem("Select Class");
+        for (I_Class clas : classes) {
+            jClassBox.addItem(clas.getName());
+        }
         jAddButton.setText("Add New Row");
-        for(I_Class clas:classes)
-        {
-            if(clas.getId().equals(classId)){
-                jComboBox1.setSelectedItem(clas.getName());
+        for (I_Class clas : classes) {
+            if (clas.getId().equals(classId)) {
+                jClassBox.setSelectedItem(clas.getName());
+                selectedClass = clas;
                 break;
             }
         }
+        if (selectedClass.getAssignmentStatus()) {
+            subjectsLocked = true;
+        }
         doModeChanges();
-        jComboBox1ActionPerformed(null);
+        jClassBoxActionPerformed(null);
     }
 
-    private void doModeChanges(){
-        switch(currentMode){
+    private void doModeChanges() {
+        
+        switch (currentMode) {
             case READ_MODE:
                 jAddButton.setEnabled(false);
                 jRemoveButton.setEnabled(false);
                 jRemoveAllButton.setEnabled(false);
                 jEditRowButton.setEnabled(false);
                 jSaveButton.setEnabled(false);
-                if(modePermission == EDIT_MODE || modePermission == CREATE_OR_EDIT_MODE)
+                if (modePermission == EDIT_MODE || modePermission == CREATE_OR_EDIT_MODE) {
                     jEditButton.setEnabled(true);
-                else
+                } else {
                     jEditButton.setEnabled(false);
+                }
                 break;
             case CREATE_MODE:
                 jAddButton.setEnabled(true);
@@ -110,17 +120,33 @@ public class TeacherSub extends javax.swing.JFrame {
                 break;
             case EDIT_MODE:
             case CREATE_OR_EDIT_MODE:
-                jAddButton.setEnabled(true);
-                jRemoveButton.setEnabled(true);
-                jRemoveAllButton.setEnabled(true);
+            
+                if (subjectsLocked && 
+                        new TimeTables(selectedClass.getId()).updateScheduled) 
+                {
+                    int res = JOptionPane.showConfirmDialog(this, "this class has a time table "
+                            + "change scheduled.\n"
+                            + "if you choose to update assignments anyway, the current scheduled update will be discarded and deleted.\n"
+                            + "Are you sure you want to continue?\n\n"
+                            + "P.S. this message may also appear while you try to save the changes",
+                            "Change Scheduled", JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+                    if (res != JOptionPane.YES_OPTION) {
+                        break;
+                    }
+                }
+                jRemoveButton.setEnabled(!subjectsLocked);
+                jRemoveAllButton.setEnabled(!subjectsLocked);
+                jAddButton.setEnabled(!subjectsLocked);
                 jSaveButton.setEnabled(false);
                 jEditRowButton.setEnabled(false);
                 jEditButton.setEnabled(false);
                 break;
-            default:System.exit(1);
+            default:
+                System.exit(1);
         }
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -134,7 +160,7 @@ public class TeacherSub extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jClassBox = new javax.swing.JComboBox<>();
         jEditButton = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jRemoveAllButton = new javax.swing.JButton();
@@ -183,15 +209,15 @@ public class TeacherSub extends javax.swing.JFrame {
 
         jPanel3.setBackground(new java.awt.Color(0, 153, 153));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Class", "6", "7", "8" }));
-        jComboBox1.addMouseListener(new java.awt.event.MouseAdapter() {
+        jClassBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select Class", "6", "7", "8" }));
+        jClassBox.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jComboBox1MouseClicked(evt);
+                jClassBoxMouseClicked(evt);
             }
         });
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        jClassBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                jClassBoxActionPerformed(evt);
             }
         });
 
@@ -208,7 +234,7 @@ public class TeacherSub extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jClassBox, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jEditButton, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -218,7 +244,7 @@ public class TeacherSub extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+                    .addComponent(jClassBox, javax.swing.GroupLayout.PREFERRED_SIZE, 34, Short.MAX_VALUE)
                     .addComponent(jEditButton))
                 .addContainerGap())
         );
@@ -450,120 +476,124 @@ public class TeacherSub extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        int index=jComboBox1.getSelectedIndex();
-        if(index<0)
+    private void jClassBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jClassBoxActionPerformed
+        int index = jClassBox.getSelectedIndex();
+        if (index < 0) {
             return;
-        if(index==0)
+        }
+        if (index == 0)
             jLabel1.setText("Faculty Subject Records");
-        else
-        {
-            jLabel1.setText("Records Of "+classes[index-1].getName()+"th Class");
-            Object[][] records=ClassroomManager.getRecords(classes[index-1].getId());
-            if(records!=null){ 
+        else {
+            jLabel1.setText("Records Of " + classes[index - 1].getName() + "th Class");
+            Object[][] records = ClassroomManager.getRecords(classes[index - 1].getId());
+            if (records != null) {
                 model.setRowCount(0);
                 selectedSubjects.clear();
-                for(int i=0;i<records.length;i++){
-                    selectedSubjects.add(new Subject(""+records[i][3],
-                            ""+records[i][4],-1));
-                    model.addRow(new Object[]{i+1,records[i][2],records[i][1],
-                    records[i][4],records[i][3],records[i][0],records[i][5],false});
+                for (int i = 0; i < records.length; i++) {
+                    selectedSubjects.add(new Subject("" + records[i][3],
+                            "" + records[i][4], -1));
+                    model.addRow(new Object[]{i + 1,
+                        records[i][2], records[i][1],
+                        records[i][4], records[i][3],
+                        records[i][0], records[i][5], false});
                 }
-            }
-            else{
-                if(currentMode==CREATE_MODE)
+            } else {
+                if (currentMode == CREATE_MODE) {
                     return;
-                else if(modePermission==CREATE_MODE||modePermission==CREATE_OR_EDIT_MODE)
-                {
-                    currentMode=modePermission;
+                } else if (modePermission == CREATE_MODE || modePermission == CREATE_OR_EDIT_MODE) {
+                    currentMode = modePermission;
                     doModeChanges();
-                }
-                else{
-                    JOptionPane.showMessageDialog(this,"NO RECORDS FOUND , PLEASE ADD RECORDS BEFORE VIEWING");
+                } else {
+                    JOptionPane.showMessageDialog(this, "NO RECORDS FOUND , PLEASE ADD RECORDS BEFORE VIEWING");
                     this.dispose();
                 }
             }
-            jComboBox1.setEnabled(false);
+            jClassBox.setEnabled(false);
         }
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_jClassBoxActionPerformed
 
     private void jAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jAddButtonActionPerformed
-        if(currentMode == READ_MODE)
+        if (currentMode == READ_MODE) {
             return;
-        if(canAddRow)
-        {   
-            if(rowEdit){
-                rowEdit=false;
-            Faculty faculty=availableFaculties.get(selectedFacultyIndex);
-            Subject subject=availableSubjects.get(selectedSubjectIndex);
-            selectedSubjects.remove(new Subject(""+model.getValueAt(selectedRow,4)));
-            model.setValueAt(faculty.getName(),selectedRow,1);
-            model.setValueAt(faculty.getFacultyId(),selectedRow,2);
-            model.setValueAt(subject.getSubjectName(),selectedRow,3);
-            model.setValueAt(subject.getSubjectId(),selectedRow,4);
-            selectedSubjects.add(subject);
-            canAddRow=true;
-            jAddButton.setText("Add New Row");
-            jAddButton.setEnabled(true);
-            jSaveButton.setEnabled(true);
-            jEditRowButton.setText("Edit Row");
-            jEditRowButton.setEnabled(false);
-            subjectListModel.removeAllElements();
-            facultyListModel.removeAllElements();
-            }
-            else
-            {
-            System.out.println(subjects.length+" "+selectedSubjects.size());
-            if(subjects.length<=selectedSubjects.size())
-            {
-                JOptionPane.showMessageDialog(this,"Alls subjects already added");
-                return;
-            }
-            model.addRow( new Object[]{ model.getRowCount()+1,"",
-            "","","",classes[jComboBox1.getSelectedIndex()-1].getName(),
-            classes[jComboBox1.getSelectedIndex()-1].getRoomId(),false}
-                    );
-            canAddRow=false;
-            newRowNumber=jTable1.getRowCount()-1;
-            jAddButton.setText("Add Data");
-            jAddButton.setEnabled(false);
-            jSaveButton.setEnabled(false);
-            updateLists();
-            }
         }
-        else
-        {
-            Faculty faculty=availableFaculties.get(selectedFacultyIndex);
-            Subject subject=availableSubjects.get(selectedSubjectIndex);
-            model.setValueAt(faculty.getName(),newRowNumber,1);
-            model.setValueAt(faculty.getFacultyId(),newRowNumber,2);
-            model.setValueAt(subject.getSubjectName(),newRowNumber,3);
-            model.setValueAt(subject.getSubjectId(),newRowNumber,4);
+        if (canAddRow) {
+            if (rowEdit) {
+                rowEdit = false;
+                Faculty faculty = availableFaculties.get(selectedFacultyIndex);
+                Subject subject = availableSubjects.get(selectedSubjectIndex);
+                selectedSubjects.remove(new Subject("" + model.getValueAt(selectedRow, 4)));
+                model.setValueAt(faculty.getName(), selectedRow, 1);
+                model.setValueAt(faculty.getFacultyId(), selectedRow, 2);
+                model.setValueAt(subject.getSubjectName(), selectedRow, 3);
+                model.setValueAt(subject.getSubjectId(), selectedRow, 4);
+                selectedSubjects.add(subject);
+                canAddRow = true;
+                jAddButton.setText("Add New Row");
+                if (!subjectsLocked) {
+                    jAddButton.setEnabled(true);
+                } else {
+                    jAddButton.setEnabled(false);
+                }
+                jSaveButton.setEnabled(true);
+                jEditRowButton.setText("Edit Row");
+                jEditRowButton.setEnabled(false);
+                subjectListModel.removeAllElements();
+                facultyListModel.removeAllElements();
+            } else {
+                System.out.println(subjects.length + " " + selectedSubjects.size());
+                if (subjects.length <= selectedSubjects.size()) {
+                    JOptionPane.showMessageDialog(this, "Alls subjects already added");
+                    return;
+                }
+                System.out.println(classes[jClassBox.getSelectedIndex() - 1].getRoomId());
+                model.addRow(new Object[]{model.getRowCount() + 1, "",
+                    "", "", "", classes[jClassBox.getSelectedIndex() - 1].getName(),
+                    classes[jClassBox.getSelectedIndex() - 1].getRoomId(), false}
+                );
+                canAddRow = false;
+                newRowNumber = jTable1.getRowCount() - 1;
+                jAddButton.setText("Add Data");
+                jAddButton.setEnabled(false);
+                jSaveButton.setEnabled(false);
+                updateLists();
+            }
+        } else {
+            Faculty faculty = availableFaculties.get(selectedFacultyIndex);
+            Subject subject = availableSubjects.get(selectedSubjectIndex);
+            model.setValueAt(faculty.getName(), newRowNumber, 1);
+            model.setValueAt(faculty.getFacultyId(), newRowNumber, 2);
+            model.setValueAt(subject.getSubjectName(), newRowNumber, 3);
+            model.setValueAt(subject.getSubjectId(), newRowNumber, 4);
             selectedSubjects.add(subject);
-            canAddRow=true;
+            canAddRow = true;
             jAddButton.setText("Add New Row");
-            jAddButton.setEnabled(true);
+            if (!subjectsLocked) {
+                jAddButton.setEnabled(true);
+            } else {
+                jAddButton.setEnabled(false);
+            }
             subjectListModel.removeAllElements();
             facultyListModel.removeAllElements();
             jSaveButton.setEnabled(true);
         }
     }//GEN-LAST:event_jAddButtonActionPerformed
 
-    private void jComboBox1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jComboBox1MouseClicked
-    
-    }//GEN-LAST:event_jComboBox1MouseClicked
+    private void jClassBoxMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jClassBoxMouseClicked
+
+    }//GEN-LAST:event_jClassBoxMouseClicked
 
     private void jTable1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseReleased
-    int row=jTable1.getSelectedRow(),column=jTable1.getSelectedColumn();
-    if(row<0||currentMode==READ_MODE)
-        return;
-    if(!canAddRow)
-        jAddButton.setEnabled(false);
-    else{
-        selectedRow=row;
-        jEditRowButton.setEnabled(true);
-    }
-    //updateLists(); 
+        int row = jTable1.getSelectedRow(), column = jTable1.getSelectedColumn();
+        if (row < 0 || currentMode == READ_MODE) {
+            return;
+        }
+        if (!canAddRow) {
+            jAddButton.setEnabled(false);
+        } else {
+            selectedRow = row;
+            jEditRowButton.setEnabled(true);
+        }
+        //updateLists(); 
     }//GEN-LAST:event_jTable1MouseReleased
 
     private void jFacultyListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jFacultyListMouseReleased
@@ -579,152 +609,199 @@ public class TeacherSub extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jRemoveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRemoveButtonActionPerformed
-/*
+        /*
     if(!canAddRow)
     {
         JOptionPane.showMessageDialog(this,"please complete row addition operation first");
         return;
     }
-*/
-    removeRows();
+         */
+        removeRows();
     }//GEN-LAST:event_jRemoveButtonActionPerformed
 
     private void jRemoveAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRemoveAllButtonActionPerformed
-        for(int i=0;i<model.getRowCount();i++)
-            model.setValueAt(true,i,7);
+        for (int i = 0; i < model.getRowCount(); i++) {
+            model.setValueAt(true, i, 7);
+        }
         removeRows();
     }//GEN-LAST:event_jRemoveAllButtonActionPerformed
 
     private void jSubjectListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jSubjectListValueChanged
-        if(currentMode == READ_MODE)
+        if (currentMode == READ_MODE) {
             return;
+        }
 
         int index = jSubjectList.getSelectedIndex();
-    if(index>=0){
-        selectedSubjectIndex=index;
-        if(selectedFacultyIndex>=0)
-            jAddButton.setEnabled(true);
-    }
-    else {
-        selectedSubjectIndex=-1;
-        if(!canAddRow || rowEdit)
-            jAddButton.setEnabled(false);
-         }
+        if (index >= 0) {
+            selectedSubjectIndex = index;
+            if (selectedFacultyIndex >= 0) {
+                jAddButton.setEnabled(true);
+            }
+        } else {
+            selectedSubjectIndex = -1;
+            if (!canAddRow || rowEdit) {
+                jAddButton.setEnabled(false);
+            }
+        }
     }//GEN-LAST:event_jSubjectListValueChanged
 
     private void jFacultyListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jFacultyListValueChanged
-           if(currentMode == READ_MODE)
+        if (currentMode == READ_MODE) {
             return;
+        }
 
-        int index=jFacultyList.getSelectedIndex();
-    if(index>=0){
-        selectedFacultyIndex=index;
-        if(selectedSubjectIndex>=0)
-            jAddButton.setEnabled(true);
-    }
-    else {
-        selectedFacultyIndex=-1;
-        if(!canAddRow || rowEdit)
-            jAddButton.setEnabled(false);
-    }
+        int index = jFacultyList.getSelectedIndex();
+        if (index >= 0) {
+            selectedFacultyIndex = index;
+            if (selectedSubjectIndex >= 0) {
+                jAddButton.setEnabled(true);
+            }
+        } else {
+            selectedFacultyIndex = -1;
+            if (!canAddRow || rowEdit) {
+                jAddButton.setEnabled(false);
+            }
+        }
     }//GEN-LAST:event_jFacultyListValueChanged
 
     private void jSaveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jSaveButtonActionPerformed
-        if(currentMode == READ_MODE)
+        if (currentMode == READ_MODE) {
             return;
-
-        int o=JOptionPane.showConfirmDialog(this, "are you sure you want to save this?",
-        "WARNING",JOptionPane.YES_NO_OPTION);
-if(o==JOptionPane.YES_OPTION){
-    ClassSubjectFaculty[] records=new ClassSubjectFaculty[model.getRowCount()];
-    for(int i=0;i<model.getRowCount();i++){
-        records[i]=new ClassSubjectFaculty(classes[jComboBox1.getSelectedIndex()-1].getId(),
-        ""+model.getValueAt(i, 2),""+model.getValueAt(i, 4),Integer.valueOf(""+model.getValueAt(i, 6)));
-    }
-    ClassroomManager.addToRecords(records);
-    this.dispose();
-}
+        }
+        String msg = "";
+        if (subjectsLocked) 
+        {
+            if (new TimeTables(selectedClass.getId()).updateScheduled) 
+            {
+            
+                msg += "this class has a time table "
+                        + "change scheduled.\n"
+                        + "if you choose to update assignments anyway, "
+                        + "the current scheduled update will be discarded and deleted.\n\n";
+            }
+            
+                msg += "this class has a time table \n"
+                        + "if you choose to update assignments anyway, "
+                        + "the current time table will be discontinued and you would have to schedule a new one.\n\n";
+        }
+        msg += "Are you sure you want to save this";
+        
+        int res = JOptionPane.showConfirmDialog(this, msg,
+                "Change Scheduled", JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (res != JOptionPane.YES_OPTION) 
+        {
+            return;
+        }
+        ClassSubjectFaculty[] records = new ClassSubjectFaculty[model.getRowCount()];
+        for (int i = 0; i < model.getRowCount(); i++) {
+            records[i] = new ClassSubjectFaculty(classes[jClassBox.getSelectedIndex() - 1].getId(),
+                    "" + model.getValueAt(i, 2), "" + model.getValueAt(i, 4), Integer.valueOf("" + model.getValueAt(i, 6)));
+        }
+        ClassroomManager.addToRecords(records);
+        this.dispose();
+        
     }//GEN-LAST:event_jSaveButtonActionPerformed
 
     private void jEditRowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jEditRowButtonActionPerformed
-                if(currentMode == READ_MODE)
+        if (currentMode == READ_MODE) {
             return;
+        }
 
-        if(rowEdit)
-        {
-            rowEdit=false;
-            selectedRow=-1;
+        if (rowEdit) {
+            rowEdit = false;
+            selectedRow = -1;
             jAddButton.setText("Add New Row");
             jEditRowButton.setText("Edit Row");
             jEditRowButton.setEnabled(false);
-            jAddButton.setEnabled(true);
+            if (!subjectsLocked) {
+                jAddButton.setEnabled(true);
+            }
             jSaveButton.setEnabled(true);
             subjectListModel.removeAllElements();
             facultyListModel.removeAllElements();
-        }
-        else{
-            rowEdit=true;
+        } else {
+            rowEdit = true;
             jAddButton.setText("Update");
             jAddButton.setEnabled(false);
             jSaveButton.setEnabled(false);
             jEditRowButton.setText("Cancel");
             updateLists();
-            String facultyListValue=""+model.getValueAt(selectedRow,1)+"("+
-                    model.getValueAt(selectedRow,2)+")";
-            String subjectListValue=""+model.getValueAt(selectedRow,3)+"("+
-                    model.getValueAt(selectedRow,4)+")";
+            String facultyListValue = "" + model.getValueAt(selectedRow, 1) + "("
+                    + model.getValueAt(selectedRow, 2) + ")";
+            String subjectListValue = "" + model.getValueAt(selectedRow, 3) + "("
+                    + model.getValueAt(selectedRow, 4) + ")";
             jFacultyList.setSelectedValue(facultyListValue, true);
             jSubjectList.setSelectedValue(subjectListValue, true);
         }
     }//GEN-LAST:event_jEditRowButtonActionPerformed
 
     private void jEditButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jEditButtonActionPerformed
-             if( modePermission== READ_MODE || modePermission == CREATE_MODE)
+        if (modePermission == READ_MODE || modePermission == CREATE_MODE) {
             return;
+        }
 
-        currentMode=EDIT_MODE;
-     doModeChanges();
+        currentMode = EDIT_MODE;
+        doModeChanges();
     }//GEN-LAST:event_jEditButtonActionPerformed
 
-    private void removeRows(){
-    int removed=0;
-    for(int i=0;i<model.getRowCount();i++)
-        if((boolean)model.getValueAt(i,7)==true)
-        {  System.out.println(new Subject(""+model.getValueAt(i,4)));
-        selectedSubjects.remove(new Subject(""+model.getValueAt(i,4)));
-        if(i==model.getRowCount()-1&&canAddRow==false){
-            canAddRow=true;
-            jAddButton.setText("Add New Row");
-            jAddButton.setEnabled(true);
-            subjectListModel.removeAllElements();
-            facultyListModel.removeAllElements();
+    private void removeRows() {
+        int removed = 0;
+        for (int i = 0; i < model.getRowCount(); i++) {
+            if ((boolean) model.getValueAt(i, 7) == true) {
+                System.out.println(new Subject("" + model.getValueAt(i, 4)));
+                selectedSubjects.remove(new Subject("" + model.getValueAt(i, 4)));
+                if (i == model.getRowCount() - 1 && canAddRow == false) {
+                    canAddRow = true;
+                    jAddButton.setText("Add New Row");
+                    jAddButton.setEnabled(true);
+                    subjectListModel.removeAllElements();
+                    facultyListModel.removeAllElements();
+                }
+                model.removeRow(i);
+                removed++;
+                i--;
+            }
         }
-        model.removeRow(i);
-        removed++;
-        i--;
+        if (removed > 0) {
+        } else {
+            JOptionPane.showMessageDialog(this, "please select rows to remove first");
         }
-    if(removed>0){
     }
-    else JOptionPane.showMessageDialog(this,"please select rows to remove first");    
-    }
-    
-    private void updateLists(){
+
+    private void updateLists() {
         subjectListModel.removeAllElements();
         facultyListModel.removeAllElements();
-        availableFaculties=new ArrayList<>();
-        availableSubjects=new ArrayList<>();
-        for(Subject subject: subjects){
-            if((!rowEdit && selectedSubjects.contains(subject)) ||
-               (rowEdit && selectedSubjects.contains(subject) && subject.equals(new Subject(""+model.getValueAt(selectedRow,4)))==false))
-                continue;
-            availableSubjects.add(subject);
-            subjectListModel.addElement(subject.getSubjectName()+"("+subject.getSubjectId()+")");
+        availableFaculties = new ArrayList<>();
+        availableSubjects = new ArrayList<>();
+        if (!subjectsLocked) {
+            for (Subject subject : subjects) {
+                if ((!rowEdit && selectedSubjects.contains(subject))
+                        || (rowEdit && selectedSubjects.contains(subject) && subject.equals(new Subject("" + model.getValueAt(selectedRow, 4))) == false)) {
+                    continue;
+                }
+                availableSubjects.add(subject);
+                subjectListModel.addElement(subject.getSubjectName() + "(" + subject.getSubjectId() + ")");
+            }
+        } else {
+            for (Subject subject : subjects) {
+                if ((rowEdit && selectedSubjects.contains(subject)
+                        && subject.equals(new Subject("" + model.getValueAt(selectedRow, 4))))) {
+                    availableSubjects.add(subject);
+                    subjectListModel.addElement(subject.getSubjectName() + "(" + subject.getSubjectId() + ")");
+                    break;
+                }
+            }
+
+//            selectedSubjects.contains(subject) 
+//                    && subject.equals(new Subject(""+model.getValueAt(selectedRow,4)))            
         }
-        for(Faculty faculty: faculties){
+        for (Faculty faculty : faculties) {
             availableFaculties.add(faculty);
-            facultyListModel.addElement(faculty.getName()+"("+faculty.getFacultyId()+")");
+            facultyListModel.addElement(faculty.getName() + "(" + faculty.getFacultyId() + ")");
         }
     }
+
     /**
      * @param args the command line arguments
      */
@@ -739,7 +816,7 @@ if(o==JOptionPane.YES_OPTION){
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jAddButton;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> jClassBox;
     private javax.swing.JButton jEditButton;
     private javax.swing.JButton jEditRowButton;
     private javax.swing.JList<String> jFacultyList;

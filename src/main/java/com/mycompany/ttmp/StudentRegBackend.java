@@ -25,15 +25,12 @@ public class StudentRegBackend {
         c=SqlConnect.getDatabaseConnection();
         c.setAutoCommit(false);
         s=c.createStatement();
-        String query=StudentControl.getInsertStatement(999, st);
-        System.out.println("query "+query);
+        String query=AccountControl.getInsertStatement(999, ac);
         s.executeUpdate(query);
         query=ParentDetailsControl.getInsertStatement(999, pd);
         s.executeUpdate(query);
-        query=AccountControl.getInsertStatement(999, ac);
-        s.executeUpdate(query);
-        query=StudentControl.getUpdateParentStatement(999, 
-                st.getRegistrationId(), pd.getParentId());
+        query=StudentControl.getInsertStatement(999, st);
+        System.out.println("query "+query);
         s.executeUpdate(query);
         c.commit();
      } catch (SQLException ex) {
@@ -59,15 +56,13 @@ public class StudentRegBackend {
         s=c.createStatement();
         if (code == 6969)
             s.execute("SET FOREIGN_KEY_CHECKS = 0;");
-        String query=StudentControl.getInsertStatement(999, st);
-        System.out.println("query "+query);
+        
+        String query=AccountControl.getInsertStatement(999, ac);
         s.executeUpdate(query);
         query=ParentDetailsControl.getInsertStatement(999, pd);
         s.executeUpdate(query);
-        query=AccountControl.getInsertStatement(999, ac);
-        s.executeUpdate(query);
-        query=StudentControl.getUpdateParentStatement(999, 
-                st.getRegistrationId(), pd.getParentId());
+        query=StudentControl.getInsertStatement(code, st);
+        System.out.println("query "+query);
         s.executeUpdate(query);
         if (code == 6969)
             s.execute("SET FOREIGN_KEY_CHECKS = 1;");

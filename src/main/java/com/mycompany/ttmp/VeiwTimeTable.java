@@ -5,13 +5,17 @@
  */
 package com.mycompany.ttmp;
 
-import java.time.LocalDateTime;
+import java.awt.Color;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 /**
  *
@@ -31,11 +35,16 @@ public class VeiwTimeTable extends javax.swing.JFrame {
     private String selectedTid;
     private String myId;
     private HashMap<String,Object> cellInfo = new HashMap<>();
-    private final role roleOfUser=LoginF.getUserRole();
+    //private final role roleOfUser=LoginF.getUserRole();
+    private final role roleOfUser=role.ADMIN;
+    private TableCellRenderer cellRenderer ;
+    
     private String timeTableOf;
     DefaultListModel<String> listModel;
     TimeTables timeTables;
     ArrayList<String> timeTablesList = new ArrayList<>();
+    ArrayList<ArrayList<Color>> colorData = new ArrayList<>();
+    HashMap<String, Color> listColorData = new HashMap<>();
 
     /**
      * Creates new form VeiwTimeTable
@@ -59,6 +68,18 @@ public class VeiwTimeTable extends javax.swing.JFrame {
         }
         timeTable=new String[days.length][periods.length];
         jTimeTable.setEnabled(true);    
+        for (int i = 0; i < days.length; i++)
+        {
+            ArrayList<Color> colors = new ArrayList<>();
+            
+            for(int j = 0;j <= periods.length; j++)
+                colors.add(Color.white);
+            colorData.add(colors);
+        }
+        var columnModel = jTimeTable.getColumnModel();
+        cellRenderer = new CellColorRenderer(colorData);
+        for (int i = 1; i<= periods.length; i++)
+            columnModel.getColumn(i).setCellRenderer(cellRenderer);
 }
     
     public VeiwTimeTable() {
@@ -91,12 +112,14 @@ public class VeiwTimeTable extends javax.swing.JFrame {
         if (!changeInProcess)
         {
             changeInProcess = true;
-            if (id.startsWith("C"))
-            {
-                if (timeTables == null || !timeTables.getClassId().equals(id))
+//            if (id.startsWith("C"))
+//            {
+                if (timeTables == null || !timeTables.tablesOf.equals(id))
                 {
                     timeTables = TimeTableControl.getTimeTablesList(id);
-                    jUseForCreationButton.setEnabled(true);
+                    
+                    if (roleOfUser == role.ADMIN)
+                        jUseForCreationButton.setEnabled(true);
                     updateTable(timeTables.fetchTimeTable(), id);
                     jVersionBox.removeAllItems();
                     timeTablesList = timeTables.getTimeTablesList();
@@ -116,13 +139,13 @@ public class VeiwTimeTable extends javax.swing.JFrame {
                         jVersionBox.setVisible(false);
                     }
                 }
-            }
-            else 
-            {
-                jUseForCreationButton.setEnabled(false);
-                jVersionBox.setVisible(false);
-                updateTable(TimeTableControl.getFacultyTimeTable(id),id);
-            }
+//            }
+//            else 
+//            {
+//                jUseForCreationButton.setEnabled(false);
+//                jVersionBox.setVisible(false);
+//                updateTable(TimeTableControl.getFacultyTimeTable(id),id);
+//            }
             changeInProcess = false;
         }
         
@@ -157,6 +180,7 @@ public class VeiwTimeTable extends javax.swing.JFrame {
     private void updateList(){
         if(listData==null)return;
         listModel.removeAllElements();
+        //resetColorData();
         listSearchData=new ArrayList<>();
         for(Object[] objects: listData){
             String val=objects[1]+" ("+objects[0]+")";
@@ -356,10 +380,10 @@ public class VeiwTimeTable extends javax.swing.JFrame {
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTableOfLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(jVersionBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jTableOfLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -589,19 +613,31 @@ else    switch (roleOfUser) {
         if (jVersionBox.getSelectedIndex() < 0)
             return;
         String val = timeTablesList.get(jVersionBox.getSelectedIndex());
-        String id = val.contains("_") ? val.substring(0, val.indexOf("_")): val;
-        updateTable(timeTables.fetchParticularTimeTable(val), id);
+        updateTable(timeTables.fetchParticularTimeTable(val), timeTables.tablesOf);
     }//GEN-LAST:event_jVersionBoxActionPerformed
 
     private void jUseForCreationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUseForCreationActionPerformed
-      new TTCreation(timeTables, timeTables.lastFetched).setVisible(true);
-       this.dispose();    
+        if (timeTables == null || ! timeTables.isTablesOfAClass())
+        {
+            JOptionPane.showMessageDialog(this, "Please select time table of a class first",
+                    "Invalid Operation", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        new TTCreation(timeTables, timeTables.lastFetched).setVisible(true);
+        this.dispose();    
     }//GEN-LAST:event_jUseForCreationActionPerformed
 
-    
+    private void resetColorData()
+    {
+        for (int i = 0; i< days.length; i++)
+            for (int j = 0;j <= periods.length; j++)
+                colorData.get(i).set(j, Color.white);
+    }
     private void updateTable(ArrayList<Schedule> schedule,String id){
+     //   resetColorData();
         if(schedule==null || schedule.size()<1){
-            JOptionPane.showMessageDialog(this, "Time table does not exist for the selection");
+            JOptionPane.showMessageDialog(this, "Time table does not exist"
+                    + " for the selection");
             return;
         }
             //System.out.println("Updating table : "+LocalDateTime.now());
@@ -653,8 +689,19 @@ else    switch (roleOfUser) {
                     cellInfo.put(facId,(String)FacultyControl.getSpecificData(
                            facId,new String[]{"name"}) [0] );
             String facultyName = (String)cellInfo.get(facId);
-                val=Utility.colorCodeValue(subject+" ("+facultyName+") <br>"+
-                        "("+roomId+")", subjectColor);
+                colorData.get(
+                        Integer.valueOf(cellInfo.get(record.getDayId()).toString())
+                ).set(
+                        Integer.valueOf(cellInfo.get(record.getTimeslotId()).toString()) + 1
+                        ,Color.decode(subjectColor));
+                System.out.println(record.getDayId()+ " "+ record.getTimeslotId()+" "+
+                        colorData.get(
+                        Integer.valueOf(cellInfo.get(record.getDayId()).toString())
+                ).get(
+                        Integer.valueOf(cellInfo.get(record.getTimeslotId()).toString()) + 1
+                        ));
+                val=subject+" ("+facultyName+") \n"+
+                        "("+roomId+")";
             }
             else{
                 String classId = record.getClassId();
@@ -662,8 +709,13 @@ else    switch (roleOfUser) {
                     cellInfo.put(classId,
                             ClassControl.getClass(record.getClassId()).getName());
             String className = (String)cellInfo.get(classId);
-                val=Utility.colorCodeValue(subject+"<br>"+className
-                        +"("+roomId+")", subjectColor);
+                val= subject+"\n"+className
+                        +"("+roomId+")";
+                colorData.get(
+                        Integer.valueOf(cellInfo.get(record.getDayId()).toString())
+                ).set(
+                        Integer.valueOf(cellInfo.get(record.getTimeslotId()).toString()) + 1
+                        ,Color.decode(subjectColor));
             }
             if(id.equals(myId))
             {
@@ -700,6 +752,14 @@ else    switch (roleOfUser) {
             for(int j=0;j<days.length;j++)
             {
                 String val=table[j][i];
+//                var v = jTimeTable.getCellRenderer(j, i + 1).
+//                        getTableCellRendererComponent(
+//                                jTimeTable, val, true,
+//                                false, j, i + 1);
+                //v.setBackground(color);
+                //v.setForeground(ocolor);
+                if (val == null || val.isBlank() || val.equalsIgnoreCase("free"))
+                    colorData.get(j).set(i+1, Color.white);
                 timeTableModel.setValueAt(val,j,(i+1));
             }
         //System.out.println("Displayed table : "+LocalDateTime.now());
@@ -707,7 +767,10 @@ else    switch (roleOfUser) {
     private void clearTable(){
             for(int i=0;i<periods.length;i++)
                 for(int j=0;j<days.length;j++)
+                {
+                    colorData.get(j).set(i+1, Color.white);
                     timeTableModel.setValueAt("", j, i+1);
+                }
     }
     
     /**

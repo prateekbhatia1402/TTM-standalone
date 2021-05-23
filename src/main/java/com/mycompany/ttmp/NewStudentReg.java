@@ -1085,10 +1085,15 @@ private I_Class[] classes;
    String email=jST_EmailField.getText();
    String phone=jST_MobileField.getText();
    char gender=jST_MaleRButton.isSelected()?'M':'F';
-   String pAddress=jST_ResendialArea.getText()+"@"+jST_PCityField.getText() + "@"
-           +jST_PStateField.getText()+"@"+jST_PCountryBox.getSelectedItem() + "@"+jST_PPinCodeField.getText();
-   String cAddress=jST_cAddressArea.getText()+"@"+jST_cCityField.getText()+"@"
-           +jST_cStateField.getText()+"@"+jST_cCountryBox.getSelectedItem()+"@"+jST_cPinCodeField.getText();
+   String pAddress=jST_PAddressArea.getText()+
+           "@"+jST_PCityField.getText() + "@"
+           +jST_PStateField.getText()+"@"
+           +jST_PCountryBox.getSelectedItem() 
+           + "@"+jST_PPinCodeField.getText();
+   String cAddress=jST_cAddressArea.getText()+"@"+
+           jST_cCityField.getText()+"@"
+           +jST_cStateField.getText()+"@"
+           +jST_cCountryBox.getSelectedItem()+"@"+jST_cPinCodeField.getText();
    String fatherName=jST_FaNameField.getText();
    String fatherEmail=jST_FaEmailField.getText();
    String fatherPhone=jST_FaMoblieField.getText();
@@ -1106,7 +1111,17 @@ private I_Class[] classes;
    Date fatherDob=new Date(year,month,date);
    String motherName=jST_MoNameField.getText();
    String motherEmail=jST_MoEmailField.getText();
+   if ("".equals(motherEmail.trim()) && "".equals(fatherEmail.trim()))
+   {
+       JOptionPane.showMessageDialog(this, "please fill email of atleast one parent");
+       return;
+   }    
    String motherPhone=jST_MoMoblieField.getText();
+   if ("".equals(motherPhone.trim()) && "".equals(fatherPhone.trim()))
+   {
+       JOptionPane.showMessageDialog(this, "please fill email of atleast one parent");
+       return;
+   }
    if(jST_MoYearBox.getSelectedIndex()==0 || jST_MoMonthBox.getSelectedIndex()==0
            || jST_MoDateBox.getSelectedIndex()==0)
    {
@@ -1133,10 +1148,15 @@ private I_Class[] classes;
    I_Class clas=null;
    if(jST_ClassBox.getSelectedIndex()>0)
        clas=classes[jST_ClassBox.getSelectedIndex()-1];
-   Student student=Student.createStudent(regId,fname+" "+lname,username,email,phone,pAddress,cAddress,rollNo,
+   Student student=Student.createStudent(regId,fname+" "+lname,
+           username,email,phone,pAddress,cAddress,rollNo,
            dob,dor,gender,bloodGroup,parentID,clas);
-   ParentDetails parent=ParentDetails.createParentDetails(parentID, fatherName, fatherEmail, fatherPhone, fatherDob,motherName, motherEmail, motherPhone,motherDob, familyIncome,student);
+   ParentDetails parent=ParentDetails.createParentDetails(parentID, fatherName,
+           fatherEmail, fatherPhone, fatherDob,motherName, motherEmail,
+           motherPhone,motherDob, familyIncome,student);
    Account account=Account.createAccount(username,password,"student");
+        System.out.println(jST_PAddressArea.getText());
+        System.out.println(student.getPermanentAddress());
    int status = StudentRegBackend.addStudentToRecords(student, parent,account);
    if (status == 0)
    {

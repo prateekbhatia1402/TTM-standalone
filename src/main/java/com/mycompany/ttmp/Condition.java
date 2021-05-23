@@ -5,6 +5,7 @@
  */
 package com.mycompany.ttmp;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
@@ -26,6 +27,9 @@ public class Condition extends javax.swing.JFrame {
     TimeSlot[] periods;
     Day[] days;
     String selectedId;
+    ArrayList<ArrayList<Boolean>> editables = new ArrayList<>();
+    ArrayList<ArrayList<Color>> colorData = new ArrayList<>();
+    HashMap<String, Color> listColorData = new HashMap<>();
     Mode currentMode;
     ArrayList<String> selections = new ArrayList<>();
     Condition(ArrayList<FacSub> allFacSub, FastSelection fastSelection, TTCreation parentForm){
@@ -34,6 +38,7 @@ public class Condition extends javax.swing.JFrame {
         allFacSubs =  allFacSub;
         allFacSubsMap = new HashMap<>();
         allFacSubs.forEach(v -> {
+            System.out.println("cond constr:: "+v);
             allFacSubsMap.put(v.getSubId(), v);
         });
         this.initFastSelection = fastSelection;
@@ -54,13 +59,35 @@ public class Condition extends javax.swing.JFrame {
         DefaultListModel<String> listModel = new DefaultListModel<>();
         listModel.clear();
         allFacSub.forEach(v -> {
-            listModel.addElement(
-                    Utility.colorCodeValue(
-                    v.getFacName() + " ("+v.getFacId()+") " + v.getSubName(),
-                            v.getColor()));
+            listColorData.putIfAbsent(v.getFacName() + " ("+v.getFacId()+") " + v.getSubName(),
+                    Color.decode(v.getColor()));
+            listModel.addElement(v.getFacName() + " ("+v.getFacId()+") " + v.getSubName()
+            );
         });
         listModel.addElement("FREE");
         jList1.setModel(listModel);
+        jList1.setCellRenderer(new ListCellRenderer(listColorData));
+        colorData.clear();
+        for (int i = 0; i< days.length; i++)
+        {
+            ArrayList<Color> colorValues = new ArrayList<>();
+            colorValues.add(Color.white);
+            for (int j = 0; j < periods.length; j++)
+            {
+                var id = fastSelection.cellValues[i][j].id;
+                Color color = 
+                        (id!= null && !id.isEmpty()&& 
+                        !id.equals("no") && !id.equalsIgnoreCase("free")) 
+                         ? Color.decode(allFacSubsMap.get(id).getColor()) :
+                            Color.white;
+                
+                System.out.println(i+" "+j+" "+id+" "+color);
+                colorValues.add(color);
+    }
+            colorData.add(colorValues);
+
+        }
+        jTable1.setDefaultRenderer(Boolean.class, new BooleanRenderer(colorData));
     }
 
     /**
@@ -357,10 +384,13 @@ public class Condition extends javax.swing.JFrame {
                 facSub = allFacSubsMap.get(id);
                 //System.out.println(facSub.getSubName()+" "+facSub.getLecturesCount());
             }
+            
+            this.editables.clear();
             for (int i = 0; i < days.length; i++)
             {
                 Object[] val = new Object[periods.length + 1];
                 Boolean editvals[] = new Boolean[periods.length + 1];
+                ArrayList<Boolean> al_editvals = new ArrayList<>();
                     for (int j = 0; j < periods.length; j++)
                     {
                         //System.out.println("for "+i+", "+j);
@@ -380,12 +410,14 @@ public class Condition extends javax.swing.JFrame {
                         }
                         //System.out.println("e & f : "+isEditable);
                         editvals[j + 1] = isEditable;
+                        al_editvals.add(j, isEditable);
+                        
                     }
+                    this.editables.add(al_editvals);
                 editvals[0] = false;
                 val[0] = days[i].getDayName();
                 for (int j = 0; j <= periods.length; j++)
                 {
-                    
                     editables[i][j] = editvals[j];
                     values[i][j] = val[j];
                 }
@@ -410,7 +442,11 @@ public class Condition extends javax.swing.JFrame {
             }
         };
         jTable1.setModel(tableModel);
+        
+        jTable1.setDefaultRenderer(Boolean.class, new BooleanRenderer(colorData));
+        
     }
+    
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
         int index = jList1.getSelectedIndex();
         if (index < 0)
@@ -465,13 +501,32 @@ public class Condition extends javax.swing.JFrame {
         {
             int day = jTable1.getSelectedRow();
             int period = jTable1.getSelectedColumn();
-            if (period > 0)
+            System.out.println("current cell "+ period+" "+day);
+            if (period > 0 && editables.get(day).get(period - 1))
             {
-                FastSelection.SelectionValue selection ;
+                Color color, ocolor;
+                FastSelection.SelectionValue selection;
             if((boolean)jTable1.getValueAt(day, period))
+                {
                 selection = FastSelection.SelectionValue.Select;
-            else selection = FastSelection.SelectionValue.None;
+                    color = Color.decode(allFacSubsMap.get(selectedId).getColor());
+                    ocolor = Utility.getOtherColorAsColor(color);
+                    
+                }
+                else 
+                {
+                    selection = FastSelection.SelectionValue.None;
+                    color = Color.white;
+                    ocolor = Utility.getOtherColorAsColor(color);
+                }
             fastSelection.add(selectedId, day, period - 1, selection);
+                colorData.get(day).set(period, color);
+                var v = jTable1.getCellRenderer(day, period).
+                        getTableCellRendererComponent(
+                                jTable1, true, false,
+                                true, day, period);
+                v.setBackground(color);
+                v.setForeground(ocolor);
             }
         }
     }//GEN-LAST:event_jTable1MouseReleased
